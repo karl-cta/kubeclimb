@@ -1,0 +1,7 @@
+kubeclimb
+kubeclimb-*
+
+# Dev / AI files
+SPEC.md
+CLAUDE.md
+.claude/
