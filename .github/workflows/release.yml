@@ -17,11 +17,15 @@ jobs:
         with:
           go-version: '1.22'
 
+      - name: Test
+        run: go test ./...
+
       - name: Build binaries
         run: |
           GOOS=darwin GOARCH=amd64 go build -ldflags "-s -w" -o kubeclimb-darwin-amd64 .
           GOOS=darwin GOARCH=arm64 go build -ldflags "-s -w" -o kubeclimb-darwin-arm64 .
           GOOS=linux GOARCH=amd64 go build -ldflags "-s -w" -o kubeclimb-linux-amd64 .
+          sha256sum kubeclimb-darwin-amd64 kubeclimb-darwin-arm64 kubeclimb-linux-amd64 > SHA256SUMS.txt
 
       - name: Create release
         uses: softprops/action-gh-release@v2
@@ -30,3 +34,4 @@ jobs:
             kubeclimb-darwin-amd64
             kubeclimb-darwin-arm64
             kubeclimb-linux-amd64
+            SHA256SUMS.txt

@@ -75,7 +75,7 @@ const MODULES = [
     <span class="hl-key">spec</span>:
       <span class="hl-key">containers</span>:
       - <span class="hl-key">name</span>: <span class="hl-str">nginx</span>
-        <span class="hl-key">image</span>: <span class="hl-str">nginx:1.27</span></code></pre><button class="copy-btn">Copier</button></div>
+        <span class="hl-key">image</span>: <span class="hl-str">nginx:1.30</span></code></pre><button class="copy-btn">Copier</button></div>
 <div class="info-box tip">Tu n'as pas besoin de comprendre ce fichier en détail maintenant. On va tout découper dans les modules suivants. Retiens juste l'idée : tu <strong>déclares</strong> ce que tu veux, K8s <strong>s'en occupe</strong>.</div>`
       },
       {
@@ -194,7 +194,7 @@ const MODULES = [
 <h3>Vérifier l'installation</h3>
 <p>Une fois installé, vérifie que minikube est bien accessible :</p>
 <div class="code-block"><pre><code><span class="hl-cmd">$ minikube version</span>
-minikube version: v1.34.0</code></pre><button class="copy-btn">Copier</button></div>
+minikube version: v1.38.1</code></pre><button class="copy-btn">Copier</button></div>
 <h3>Démarrer ton premier cluster</h3>
 <p>Lance la commande suivante pour créer et démarrer un cluster Kubernetes local :</p>
 <div class="code-block"><pre><code><span class="hl-cmd">$ minikube start</span></code></pre><button class="copy-btn">Copier</button></div>
@@ -215,14 +215,14 @@ minikube version: v1.34.0</code></pre><button class="copy-btn">Copier</button></
 <div class="code-block"><pre><code><span class="hl-comment"># Ajouter le dépôt officiel Kubernetes</span>
 <span class="hl-cmd">$ sudo apt-get update</span>
 <span class="hl-cmd">$ sudo apt-get install -y apt-transport-https ca-certificates curl</span>
-<span class="hl-cmd">$ curl -fsSL https://pkgs.k8s.io/core:/stable:/v1.31/deb/Release.key | sudo gpg --dearmor -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg</span>
-<span class="hl-cmd">$ echo 'deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.31/deb/ /' | sudo tee /etc/apt/sources.list.d/kubernetes.list</span>
+<span class="hl-cmd">$ curl -fsSL https://pkgs.k8s.io/core:/stable:/v1.36/deb/Release.key | sudo gpg --dearmor -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg</span>
+<span class="hl-cmd">$ echo 'deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.36/deb/ /' | sudo tee /etc/apt/sources.list.d/kubernetes.list</span>
 <span class="hl-cmd">$ sudo apt-get update</span>
 <span class="hl-cmd">$ sudo apt-get install -y kubectl</span></code></pre><button class="copy-btn">Copier</button></div>
 <h3>Vérifier l'installation</h3>
 <div class="code-block"><pre><code><span class="hl-cmd">$ kubectl version --client</span>
-Client Version: v1.31.0
-Kustomize Version: v5.4.2</code></pre><button class="copy-btn">Copier</button></div>
+Client Version: v1.36.0
+Kustomize Version: v5.7.1</code></pre><button class="copy-btn">Copier</button></div>
 <div class="info-box tip">Note : minikube embarque sa propre copie de kubectl. Tu peux l'utiliser avec <code>minikube kubectl -- get pods</code>. Cependant, installer kubectl séparément est recommandé car tu l'utiliseras aussi avec de vrais clusters plus tard.</div>
 <h3>Configurer l'autocomplétion</h3>
 <p>L'autocomplétion te fait gagner un temps précieux. Elle complète automatiquement les noms de commandes, de ressources et même de Pods quand tu appuies sur Tab.</p>
@@ -249,7 +249,7 @@ CoreDNS is running at https://127.0.0.1:49157/api/v1/namespaces/kube-system/serv
 <h3>Lister les noeuds</h3>
 <div class="code-block"><pre><code><span class="hl-cmd">$ kubectl get nodes</span>
 NAME       STATUS   ROLES           AGE   VERSION
-minikube   Ready    control-plane   2m    v1.31.0</code></pre><button class="copy-btn">Copier</button></div>
+minikube   Ready    control-plane   2m    v1.36.0</code></pre><button class="copy-btn">Copier</button></div>
 <p>Tu as un seul noeud nommé « minikube » avec le rôle <strong>control-plane</strong>. Dans un vrai cluster, tu verrais plusieurs noeuds ici.</p>
 <h3>Explorer les ressources du système</h3>
 <p>Kubernetes utilise un namespace spécial appelé <code>kube-system</code> pour ses propres composants. Jetons un oeil :</p>
@@ -267,6 +267,42 @@ kube-scheduler-minikube            1/1     Running   0          3m</code></pre><
 <span class="hl-cmd">$ kubectl get namespaces</span>     <span class="hl-comment"># lister les espaces de noms</span>
 <span class="hl-cmd">$ kubectl api-resources</span>      <span class="hl-comment"># tous les types de ressources disponibles</span></code></pre><button class="copy-btn">Copier</button></div>
 <div class="info-box tip">La commande <code>kubectl api-resources</code> est très utile pour découvrir tous les types d'objets que ton cluster supporte. Elle affiche aussi les abréviations : par exemple, <code>po</code> pour Pods, <code>svc</code> pour Services, <code>deploy</code> pour Deployments.</div>`
+    },
+    {
+      title: "Contextes et outils du quotidien",
+      content: `<p>Ton fichier <code>~/.kube/config</code> peut contenir plusieurs clusters. Un <strong>contexte</strong> est la combinaison d'un cluster, d'un utilisateur et d'un namespace par défaut. C'est ce qui détermine où partent tes commandes.</p>
+<div class="code-block"><pre><code><span class="hl-cmd">$ kubectl config get-contexts</span>
+CURRENT   NAME       CLUSTER    NAMESPACE
+*         minikube   minikube   default
+
+<span class="hl-cmd">$ kubectl config current-context</span>
+<span class="hl-cmd">$ kubectl config use-context minikube</span>
+
+<span class="hl-comment"># Changer le namespace par défaut du contexte courant</span>
+<span class="hl-cmd">$ kubectl config set-context --current <span class="hl-flag">--namespace</span>=dev</span></code></pre><button class="copy-btn">Copier</button></div>
+<div class="info-box warning">La dernière commande évite de taper <code>-n dev</code> cinquante fois par jour, mais elle est aussi la source d'accidents classiques : on croit être en dev, on est en prod. Prends l'habitude de vérifier ton contexte avant toute commande destructive.</div>
+<h3>Les outils qui changent la vie</h3>
+<p>Aucun n'est obligatoire, mais tu les croiseras partout dans le monde Kubernetes.</p>
+<div class="code-block"><pre><code><span class="hl-comment"># k9s : une interface terminal pour naviguer dans le cluster</span>
+<span class="hl-cmd">$ brew install k9s</span>          <span class="hl-comment"># macOS</span>
+<span class="hl-cmd">$ k9s</span>
+
+<span class="hl-comment"># kubectx / kubens : changer de cluster ou de namespace en un mot</span>
+<span class="hl-cmd">$ brew install kubectx</span>
+<span class="hl-cmd">$ kubens dev</span>
+<span class="hl-cmd">$ kubectx minikube</span>
+
+<span class="hl-comment"># stern : suivre les logs de plusieurs Pods à la fois</span>
+<span class="hl-cmd">$ stern api</span>              <span class="hl-comment"># logs de tous les Pods dont le nom contient "api"</span></code></pre><button class="copy-btn">Copier</button></div>
+<p><strong>k9s</strong> mérite une mention particulière : il affiche en temps réel les Pods, les logs, les events, et permet de supprimer ou décrire une ressource au clavier. Beaucoup d'administrateurs y passent leurs journées.</p>
+<div class="info-box tip">Apprends d'abord kubectl en ligne de commande. C'est ce qui est évalué en entretien et en certification, et c'est ce qui fonctionne partout, y compris dans un script ou sur une machine où tu ne peux rien installer. Les outils graphiques viennent après, comme accélérateurs.</div>
+<h3>Deux flags à connaître tout de suite</h3>
+<div class="code-block"><pre><code><span class="hl-comment"># Générer un YAML de départ sans rien créer</span>
+<span class="hl-cmd">$ kubectl run web <span class="hl-flag">--image</span>=nginx:1.30 <span class="hl-flag">--dry-run</span>=client <span class="hl-flag">-o</span> yaml > pod.yaml</span>
+
+<span class="hl-comment"># Consulter la documentation d'un champ, hors ligne</span>
+<span class="hl-cmd">$ kubectl explain pod.spec.containers</span></code></pre><button class="copy-btn">Copier</button></div>
+<p>Ces deux commandes reviennent en permanence dans la suite de la formation. La première évite d'écrire du YAML de zéro, la seconde évite d'aller chercher la documentation dans un navigateur.</p>`
     }
   ],
   exercises: [
@@ -280,7 +316,16 @@ kube-scheduler-minikube            1/1     Running   0          3m</code></pre><
         "Vérifie que le cluster est en cours d'exécution avec <code>minikube status</code>."
       ],
       validation: "La commande <code>minikube status</code> doit afficher <code>host: Running</code>, <code>kubelet: Running</code> et <code>apiserver: Running</code>.",
-      hint: "Si minikube start échoue, vérifie que Docker est bien lancé avec <code>docker ps</code>. Le driver Docker doit être actif."
+      hint: "Si minikube start échoue, vérifie que Docker est bien lancé avec <code>docker ps</code>. Le driver Docker doit être actif.",
+      check: [
+        {
+          label: "Le cluster répond",
+          args: ["get", "nodes", "-o", "json"],
+          rules: [
+            { path: "items.length", atLeast: 1, label: "Au moins un noeud est enregistré dans le cluster" }
+          ]
+        }
+      ]
     },
     {
       title: "Exercice 2 : Installer kubectl et vérifier la connexion",
@@ -293,7 +338,23 @@ kube-scheduler-minikube            1/1     Running   0          3m</code></pre><
         "Configure l'autocomplétion pour ton shell (bash ou zsh)."
       ],
       validation: "La commande <code>kubectl get nodes</code> doit afficher un noeud <code>minikube</code> avec le statut <code>Ready</code>.",
-      hint: "Si kubectl ne trouve pas le cluster, minikube a peut-être été arrêté. Relance-le avec <code>minikube start</code>."
+      hint: "Si kubectl ne trouve pas le cluster, minikube a peut-être été arrêté. Relance-le avec <code>minikube start</code>.",
+      check: [
+        {
+          label: "kubectl est configuré",
+          args: ["version", "-o", "json"],
+          rules: [
+            { path: "clientVersion.gitVersion", label: "kubectl répond et annonce sa version" }
+          ]
+        },
+        {
+          label: "Le cluster est joignable",
+          args: ["get", "nodes", "-o", "json"],
+          rules: [
+            { path: "items.*.status.nodeInfo.kubeletVersion", label: "kubectl dialogue bien avec l'API server" }
+          ]
+        }
+      ]
     }
   ],
   commands: [
@@ -405,7 +466,7 @@ kube-scheduler-minikube            1/1     Running   0          3m</code></pre><
       content: `<p>Il existe deux façons de créer un Pod : la méthode <strong>impérative</strong> (commande directe) et la méthode <strong>déclarative</strong> (fichier YAML).</p>
 <h3>Méthode impérative</h3>
 <p>La commande <code>kubectl run</code> crée un Pod directement :</p>
-<div class="code-block"><pre><code><span class="hl-cmd">$ kubectl run mon-nginx --image=nginx:1.27</span>
+<div class="code-block"><pre><code><span class="hl-cmd">$ kubectl run mon-nginx --image=nginx:1.30</span>
 pod/mon-nginx created</code></pre><button class="copy-btn">Copier</button></div>
 <p>Vérifie que le Pod est créé :</p>
 <div class="code-block"><pre><code><span class="hl-cmd">$ kubectl get pods</span>
@@ -423,7 +484,7 @@ mon-nginx   1/1     Running   0          10s</code></pre><button class="copy-btn
 <span class="hl-key">spec</span>:
   <span class="hl-key">containers</span>:
   - <span class="hl-key">name</span>: <span class="hl-str">nginx</span>
-    <span class="hl-key">image</span>: <span class="hl-str">nginx:1.27</span>
+    <span class="hl-key">image</span>: <span class="hl-str">nginx:1.30</span>
     <span class="hl-key">ports</span>:
     - <span class="hl-key">containerPort</span>: <span class="hl-num">80</span></code></pre><button class="copy-btn">Copier</button></div>
 <p>Détaillons chaque partie :</p>
@@ -431,7 +492,7 @@ mon-nginx   1/1     Running   0          10s</code></pre><button class="copy-btn
 <li><strong>apiVersion: v1</strong> : les Pods font partie de l'API de base (core v1).</li>
 <li><strong>kind: Pod</strong> : le type d'objet que l'on crée.</li>
 <li><strong>metadata</strong> : le nom du Pod et ses labels (étiquettes pour l'identifier).</li>
-<li><strong>spec</strong> : la spécification, c'est-à-dire ce qu'on veut. Ici, un conteneur nommé « nginx » basé sur l'image <code>nginx:1.27</code>, exposant le port 80.</li>
+<li><strong>spec</strong> : la spécification, c'est-à-dire ce qu'on veut. Ici, un conteneur nommé « nginx » basé sur l'image <code>nginx:1.30</code>, exposant le port 80.</li>
 </ul>
 <p>Applique ce fichier :</p>
 <div class="code-block"><pre><code><span class="hl-cmd">$ kubectl apply -f pod-nginx.yaml</span>
@@ -526,6 +587,29 @@ pod "mon-nginx" deleted</code></pre><button class="copy-btn">Copier</button></di
   - <span class="hl-key">name</span>: <span class="hl-str">logs</span>
     <span class="hl-key">emptyDir</span>: {}</code></pre><button class="copy-btn">Copier</button></div>
 <p>Dans cet exemple, le conteneur <code>app</code> écrit des logs dans un fichier, et le conteneur <code>sidecar</code> lit ce fichier en continu. Ils partagent le volume <code>logs</code>.</p>
+<h3>Les sidecars natifs</h3>
+<p>Le YAML ci-dessus a un défaut : les deux conteneurs démarrent en parallèle, dans un ordre non garanti. Si le sidecar doit être prêt <em>avant</em> l'application (un proxy réseau par exemple), ça ne marche pas. Et sur un Job, un sidecar qui tourne en boucle empêche le Pod de se terminer.</p>
+<p>Kubernetes a réglé ça avec les <strong>sidecars natifs</strong> : un initContainer avec <code>restartPolicy: Always</code>. Stable depuis la version 1.33, c'est la forme à utiliser aujourd'hui.</p>
+<div class="code-block"><pre><code><span class="hl-key">spec</span>:
+  <span class="hl-key">initContainers</span>:
+  - <span class="hl-key">name</span>: <span class="hl-str">log-shipper</span>
+    <span class="hl-key">image</span>: <span class="hl-str">busybox:1.37</span>
+    <span class="hl-key">restartPolicy</span>: <span class="hl-str">Always</span>      <span class="hl-comment"># c'est ce champ qui en fait un sidecar</span>
+    <span class="hl-key">command</span>: [<span class="hl-str">"sh"</span>, <span class="hl-str">"-c"</span>, <span class="hl-str">"tail -F /var/log/app.log"</span>]
+    <span class="hl-key">volumeMounts</span>:
+    - <span class="hl-key">name</span>: <span class="hl-str">logs</span>
+      <span class="hl-key">mountPath</span>: <span class="hl-str">/var/log</span>
+  <span class="hl-key">containers</span>:
+  - <span class="hl-key">name</span>: <span class="hl-str">app</span>
+    <span class="hl-key">image</span>: <span class="hl-str">busybox:1.37</span>
+    <span class="hl-key">command</span>: [<span class="hl-str">"sh"</span>, <span class="hl-str">"-c"</span>, <span class="hl-str">"while true; do date >> /var/log/app.log; sleep 5; done"</span>]
+    <span class="hl-key">volumeMounts</span>:
+    - <span class="hl-key">name</span>: <span class="hl-str">logs</span>
+      <span class="hl-key">mountPath</span>: <span class="hl-str">/var/log</span>
+  <span class="hl-key">volumes</span>:
+  - <span class="hl-key">name</span>: <span class="hl-str">logs</span>
+    <span class="hl-key">emptyDir</span>: {}</code></pre><button class="copy-btn">Copier</button></div>
+<p>Trois garanties en plus : le sidecar démarre avant les conteneurs principaux, il est redémarré s'il tombe, et il s'arrête proprement quand l'application se termine.</p>
 <div class="info-box note">Règle d'or : place plusieurs conteneurs dans un même Pod uniquement s'ils <strong>doivent</strong> partager des ressources (réseau, stockage). Si deux conteneurs peuvent fonctionner indépendamment, mets-les dans des Pods séparés.</div>`
     },
     {
@@ -575,7 +659,7 @@ mon-app     0/1     ImagePullBackOff   0          2m</code></pre><button class="
       title: "Exercice 1 : Créer un Pod à partir d'un fichier YAML",
       desc: "Crée un fichier YAML décrivant un Pod et déploie-le dans ton cluster.",
       steps: [
-        "Crée un fichier <code>mon-pod.yaml</code> décrivant un Pod nommé <code>web-test</code> utilisant l'image <code>nginx:1.27</code> avec le port 80 exposé.",
+        "Crée un fichier <code>mon-pod.yaml</code> décrivant un Pod nommé <code>web-test</code> utilisant l'image <code>nginx:1.30</code> avec le port 80 exposé.",
         "Applique le fichier avec <code>kubectl apply -f mon-pod.yaml</code>.",
         "Vérifie que le Pod est en cours d'exécution avec <code>kubectl get pods</code>.",
         "Affiche les détails du Pod avec <code>kubectl describe pod web-test</code>.",
@@ -583,7 +667,18 @@ mon-app     0/1     ImagePullBackOff   0          2m</code></pre><button class="
         "Supprime le Pod avec <code>kubectl delete pod web-test</code>."
       ],
       validation: "Après <code>kubectl apply</code>, le Pod doit apparaître avec le statut <code>Running</code> dans la sortie de <code>kubectl get pods</code>.",
-      hint: "N'oublie pas les 4 champs obligatoires dans le YAML : apiVersion (v1), kind (Pod), metadata (avec name), et spec (avec containers)."
+      hint: "N'oublie pas les 4 champs obligatoires dans le YAML : apiVersion (v1), kind (Pod), metadata (avec name), et spec (avec containers).",
+      check: [
+        {
+          label: "Le Pod web-test existe",
+          args: ["get", "pod", "web-test", "-o", "json"],
+          rules: [
+            { path: "status.phase", equals: "Running", label: "Le Pod web-test est Running" },
+            { path: "spec.containers.*.image", contains: "nginx:1.30", label: "Il utilise l'image nginx:1.30" },
+            { path: "spec.containers.*.ports.*.containerPort", equals: 80, label: "Le port 80 est déclaré" }
+          ]
+        }
+      ]
     },
     {
       title: "Exercice 2 : Débuguer un Pod défaillant",
@@ -593,11 +688,21 @@ mon-app     0/1     ImagePullBackOff   0          2m</code></pre><button class="
         "Observe le statut avec <code>kubectl get pods</code> (tu devrais voir <code>ImagePullBackOff</code> ou <code>ErrImagePull</code>).",
         "Utilise <code>kubectl describe pod bug-test</code> et lis la section Events pour comprendre l'erreur.",
         "Supprime le Pod : <code>kubectl delete pod bug-test</code>.",
-        "Crée maintenant un Pod avec la bonne image : <code>kubectl run bug-test --image=nginx:1.27</code>.",
+        "Crée maintenant un Pod avec la bonne image : <code>kubectl run bug-test --image=nginx:1.30</code>.",
         "Vérifie qu'il fonctionne correctement."
       ],
       validation: "Tu dois être capable d'identifier l'erreur <code>ImagePullBackOff</code> dans les événements du Pod et comprendre qu'elle est causée par un nom d'image incorrect.",
-      hint: "La section Events de <code>kubectl describe pod</code> affiche les messages d'erreur détaillés. Cherche les lignes contenant « Failed » ou « Error »."
+      hint: "La section Events de <code>kubectl describe pod</code> affiche les messages d'erreur détaillés. Cherche les lignes contenant « Failed » ou « Error ».",
+      check: [
+        {
+          label: "Le Pod bug-test existe",
+          args: ["get", "pod", "bug-test", "-o", "json"],
+          rules: [
+            { path: "status.phase", equals: "Running", label: "Le Pod bug-test tourne après correction" },
+            { path: "spec.containers.*.image", contains: "nginx:1.30", label: "L'image cassée a été remplacée par nginx:1.30" }
+          ]
+        }
+      ]
     }
   ],
   commands: [
@@ -725,7 +830,7 @@ mon-app     0/1     ImagePullBackOff   0          2m</code></pre><button class="
     {
       title: "Créer un Deployment",
       content: `<h3>Méthode impérative</h3>
-<div class="code-block"><pre><code><span class="hl-cmd">$ kubectl create deployment mon-app --image=nginx:1.27 --replicas=3</span>
+<div class="code-block"><pre><code><span class="hl-cmd">$ kubectl create deployment mon-app --image=nginx:1.30 --replicas=3</span>
 deployment.apps/mon-app created</code></pre><button class="copy-btn">Copier</button></div>
 <p>Vérifie l'état :</p>
 <div class="code-block"><pre><code><span class="hl-cmd">$ kubectl get deployments</span>
@@ -760,7 +865,7 @@ mon-app-6d9f8b5c7d-ghi56   1/1     Running   0          30s</code></pre><button 
     <span class="hl-key">spec</span>:
       <span class="hl-key">containers</span>:
       - <span class="hl-key">name</span>: <span class="hl-str">nginx</span>
-        <span class="hl-key">image</span>: <span class="hl-str">nginx:1.27</span>
+        <span class="hl-key">image</span>: <span class="hl-str">nginx:1.30</span>
         <span class="hl-key">ports</span>:
         - <span class="hl-key">containerPort</span>: <span class="hl-num">80</span></code></pre><button class="copy-btn">Copier</button></div>
 <p>Analysons la structure :</p>
@@ -792,7 +897,7 @@ mon-app-6d9f8b5c7d-mno90   1/1     Running   0          10s</code></pre><button 
       content: `<p>L'un des plus grands avantages des Deployments est la <strong>mise à jour progressive</strong> (rolling update). Au lieu de couper tous les Pods d'un coup et de les remplacer, Kubernetes les remplace un par un.</p>
 <h3>Rolling update</h3>
 <p>Pour mettre à jour l'image de ton application :</p>
-<div class="code-block"><pre><code><span class="hl-cmd">$ kubectl set image deployment/mon-app nginx=nginx:1.28</span>
+<div class="code-block"><pre><code><span class="hl-cmd">$ kubectl set image deployment/mon-app nginx=nginx:1.30</span>
 deployment.apps/mon-app image updated</code></pre><button class="copy-btn">Copier</button></div>
 <p>Suis la mise à jour en temps réel :</p>
 <div class="code-block"><pre><code><span class="hl-cmd">$ kubectl rollout status deployment/mon-app</span>
@@ -802,15 +907,15 @@ deployment "mon-app" successfully rolled out</code></pre><button class="copy-btn
 <p>Voici ce qui se passe en coulisses :</p>
 <div class="diagram">
 <span class="d-accent">Avant la mise à jour :</span>
-ReplicaSet-v1 (nginx:1.27) : Pod Pod Pod    [3 réplicas]
+ReplicaSet-v1 (nginx:1.30) : Pod Pod Pod    [3 réplicas]
 
 <span class="d-accent">Pendant la mise à jour :</span>
-ReplicaSet-v1 (nginx:1.27) : Pod Pod         [2 réplicas, en réduction]
-ReplicaSet-v2 (nginx:1.28) : Pod             [1 réplica, en augmentation]
+ReplicaSet-v1 (nginx:1.30) : Pod Pod         [2 réplicas, en réduction]
+ReplicaSet-v2 (nginx:1.30) : Pod             [1 réplica, en augmentation]
 
 <span class="d-accent">Après la mise à jour :</span>
-ReplicaSet-v1 (nginx:1.27) :                 [0 réplicas, conservé pour rollback]
-ReplicaSet-v2 (nginx:1.28) : Pod Pod Pod     [3 réplicas]
+ReplicaSet-v1 (nginx:1.30) :                 [0 réplicas, conservé pour rollback]
+ReplicaSet-v2 (nginx:1.30) : Pod Pod Pod     [3 réplicas]
 </div>
 <p>Le Deployment crée un <strong>nouveau ReplicaSet</strong> avec la nouvelle image, puis augmente progressivement ses réplicas tout en réduisant ceux de l'ancien ReplicaSet. L'ancien ReplicaSet est conservé (avec 0 réplicas) pour permettre un rollback.</p>
 <h3>Consulter l'historique</h3>
@@ -818,7 +923,9 @@ ReplicaSet-v2 (nginx:1.28) : Pod Pod Pod     [3 réplicas]
 REVISION  CHANGE-CAUSE
 1         &lt;none&gt;
 2         &lt;none&gt;</code></pre><button class="copy-btn">Copier</button></div>
-<div class="info-box tip">Pour que la colonne CHANGE-CAUSE soit remplie, ajoute le flag <code>--record</code> à tes commandes (par exemple <code>kubectl set image ... --record</code>), ou annote ton Deployment manuellement avec <code>kubectl annotate deployment/mon-app kubernetes.io/change-cause="Mise à jour vers nginx 1.28"</code>.</div>
+<div class="info-box warning">Le flag <code>--record</code> que tu croiseras dans de vieux tutoriels a été supprimé de kubectl (déprécié en 1.18, retiré en 1.27). Il ne fonctionne plus.</div>
+<p>Pour remplir la colonne CHANGE-CAUSE, pose toi-même l'annotation prévue pour ça :</p>
+<div class="code-block"><pre><code><span class="hl-cmd">$ kubectl annotate deployment/mon-app kubernetes.io/change-cause="Passage nginx 1.29 vers 1.30"</span></code></pre><button class="copy-btn">Copier</button></div>
 <h3>Rollback</h3>
 <p>Si la nouvelle version pose problème, tu peux revenir à la version précédente instantanément :</p>
 <div class="code-block"><pre><code><span class="hl-cmd">$ kubectl rollout undo deployment/mon-app</span>
@@ -929,7 +1036,7 @@ namespace/dev created
       title: "Exercice 1 : Créer un Deployment et le mettre à l'échelle",
       desc: "Crée un Deployment, vérifie ses composants, puis ajuste le nombre de réplicas.",
       steps: [
-        "Crée un Deployment nommé <code>web-server</code> avec l'image <code>nginx:1.27</code> et 2 réplicas : <code>kubectl create deployment web-server --image=nginx:1.27 --replicas=2</code>.",
+        "Crée un Deployment nommé <code>web-server</code> avec l'image <code>nginx:1.30</code> et 2 réplicas : <code>kubectl create deployment web-server --image=nginx:1.30 --replicas=2</code>.",
         "Vérifie le Deployment : <code>kubectl get deployment web-server</code>.",
         "Vérifie le ReplicaSet créé : <code>kubectl get replicasets</code>.",
         "Vérifie les Pods créés : <code>kubectl get pods</code>.",
@@ -939,15 +1046,26 @@ namespace/dev created
         "Supprime le Deployment : <code>kubectl delete deployment web-server</code>."
       ],
       validation: "Après le scale à 5, <code>kubectl get deployment web-server</code> doit afficher <code>5/5</code> dans la colonne READY. Après le scale à 1, il doit afficher <code>1/1</code>.",
-      hint: "Utilise <code>kubectl get pods -w</code> pour observer en temps réel la création et la suppression des Pods pendant le scaling."
+      hint: "Utilise <code>kubectl get pods -w</code> pour observer en temps réel la création et la suppression des Pods pendant le scaling.",
+      check: [
+        {
+          label: "Le Deployment web-server existe",
+          args: ["get", "deployment", "web-server", "-o", "json"],
+          rules: [
+            { path: "spec.replicas", label: "Le Deployment web-server est déclaré" },
+            { path: "status.readyReplicas", atLeast: 1, label: "Au moins un réplica est prêt" },
+            { path: "spec.template.spec.containers.*.image", contains: "nginx", label: "Il déploie bien nginx" }
+          ]
+        }
+      ]
     },
     {
       title: "Exercice 2 : Rolling update et rollback",
       desc: "Effectue une mise à jour progressive puis annule-la avec un rollback.",
       steps: [
-        "Crée un Deployment : <code>kubectl create deployment rolling-test --image=nginx:1.26 --replicas=3</code>.",
+        "Crée un Deployment : <code>kubectl create deployment rolling-test --image=nginx:1.29 --replicas=3</code>.",
         "Vérifie que les 3 Pods sont en cours d'exécution.",
-        "Lance une mise à jour vers nginx:1.27 : <code>kubectl set image deployment/rolling-test nginx=nginx:1.27</code>.",
+        "Lance une mise à jour vers nginx:1.30 : <code>kubectl set image deployment/rolling-test nginx=nginx:1.30</code>.",
         "Suis la progression : <code>kubectl rollout status deployment/rolling-test</code>.",
         "Vérifie l'historique : <code>kubectl rollout history deployment/rolling-test</code>.",
         "Simule un problème en mettant une mauvaise image : <code>kubectl set image deployment/rolling-test nginx=nginx:inexistante</code>.",
@@ -956,14 +1074,24 @@ namespace/dev created
         "Vérifie que tout est revenu à la normale : <code>kubectl get pods</code>.",
         "Nettoie : <code>kubectl delete deployment rolling-test</code>."
       ],
-      validation: "Après le rollback, tous les Pods doivent être en statut <code>Running</code> avec l'image <code>nginx:1.27</code>. Vérifie avec <code>kubectl describe deployment rolling-test</code>.",
-      hint: "Pour voir l'image utilisée par un Deployment, utilise <code>kubectl describe deployment rolling-test</code> et cherche la ligne « Image »."
+      validation: "Après le rollback, tous les Pods doivent être en statut <code>Running</code> avec l'image <code>nginx:1.30</code>. Vérifie avec <code>kubectl describe deployment rolling-test</code>.",
+      hint: "Pour voir l'image utilisée par un Deployment, utilise <code>kubectl describe deployment rolling-test</code> et cherche la ligne « Image ».",
+      check: [
+        {
+          label: "Le Deployment rolling-test existe",
+          args: ["get", "deployment", "rolling-test", "-o", "json"],
+          rules: [
+            { path: "spec.template.spec.containers.*.image", contains: "nginx:1.30", label: "L'image est revenue à nginx:1.30 après le rollback" },
+            { path: "status.readyReplicas", atLeast: 3, label: "Les 3 réplicas sont prêts" }
+          ]
+        }
+      ]
     }
   ],
   commands: [
     {
-      prompt: "Quelle commande crée un Deployment nommé 'api' avec l'image node:20 ?",
-      answers: ["kubectl create deployment api --image=node:20", "kubectl create deployment api --image node:20"]
+      prompt: "Quelle commande crée un Deployment nommé 'api' avec l'image node:22 ?",
+      answers: ["kubectl create deployment api --image=node:22", "kubectl create deployment api --image node:22"]
     },
     {
       prompt: "Quelle commande met à l'échelle le Deployment 'api' à 4 réplicas ?",
@@ -1112,7 +1240,7 @@ EOF</span>
 <span class="hl-key">spec</span>:
   <span class="hl-key">containers</span>:
   - <span class="hl-key">name</span>: <span class="hl-str">app</span>
-    <span class="hl-key">image</span>: <span class="hl-str">nginx:1.27</span>
+    <span class="hl-key">image</span>: <span class="hl-str">nginx:1.30</span>
     <span class="hl-key">env</span>:
     <span class="hl-comment"># Injecter UNE clé spécifique</span>
     - <span class="hl-key">name</span>: <span class="hl-str">DATABASE_HOST</span>
@@ -1134,7 +1262,7 @@ EOF</span>
 <span class="hl-key">spec</span>:
   <span class="hl-key">containers</span>:
   - <span class="hl-key">name</span>: <span class="hl-str">app</span>
-    <span class="hl-key">image</span>: <span class="hl-str">nginx:1.27</span>
+    <span class="hl-key">image</span>: <span class="hl-str">nginx:1.30</span>
     <span class="hl-key">volumeMounts</span>:
     - <span class="hl-key">name</span>: <span class="hl-str">config-volume</span>
       <span class="hl-key">mountPath</span>: <span class="hl-str">/etc/config</span>
@@ -1214,7 +1342,7 @@ EOF</span>
 <span class="hl-key">spec</span>:
   <span class="hl-key">containers</span>:
   - <span class="hl-key">name</span>: <span class="hl-str">app</span>
-    <span class="hl-key">image</span>: <span class="hl-str">nginx:1.27</span>
+    <span class="hl-key">image</span>: <span class="hl-str">nginx:1.30</span>
     <span class="hl-key">env</span>:
     <span class="hl-comment"># Variable d'environnement depuis un Secret</span>
     - <span class="hl-key">name</span>: <span class="hl-str">DB_PASSWORD</span>
@@ -1303,7 +1431,7 @@ EOF</span>
       steps: [
         "Crée un ConfigMap : <code>kubectl create configmap app-config --from-literal=APP_ENV=dev --from-literal=LOG_LEVEL=debug --from-literal=APP_PORT=8080</code>",
         "Vérifie le contenu : <code>kubectl get configmap app-config -o yaml</code>",
-        "Crée un Pod qui injecte le ConfigMap en variables d'environnement. Génère le YAML de base : <code>kubectl run test-env --image=busybox:1.36 --dry-run=client -o yaml -- sleep 3600</code>, puis ajoute une section <code>envFrom</code> avec <code>configMapRef</code> pointant vers <code>app-config</code>",
+        "Crée un Pod qui injecte le ConfigMap en variables d'environnement. Génère le YAML de base : <code>kubectl run test-env --image=busybox:1.37 --dry-run=client -o yaml -- sleep 3600</code>, puis ajoute une section <code>envFrom</code> avec <code>configMapRef</code> pointant vers <code>app-config</code>",
         "Applique le YAML : <code>kubectl apply -f pod-env.yaml</code>",
         "Vérifie les variables : <code>kubectl exec test-env -- env | grep -E 'APP_|LOG_'</code>",
         "Crée un second Pod qui monte le ConfigMap en volume au chemin <code>/etc/config</code>",
@@ -1311,7 +1439,25 @@ EOF</span>
         "Nettoie : <code>kubectl delete pod test-env test-vol && kubectl delete configmap app-config</code>"
       ],
       validation: "Tu dois voir les variables APP_ENV=dev, LOG_LEVEL=debug et APP_PORT=8080 dans le premier Pod, et les fichiers correspondants dans /etc/config/ du second Pod.",
-      hint: "Pour le Pod avec envFrom, ajoute ceci dans la spec du conteneur :<br><code>envFrom:<br>- configMapRef:<br>&nbsp;&nbsp;&nbsp;&nbsp;name: app-config</code>"
+      hint: "Pour le Pod avec envFrom, ajoute ceci dans la spec du conteneur :<br><code>envFrom:<br>- configMapRef:<br>&nbsp;&nbsp;&nbsp;&nbsp;name: app-config</code>",
+      check: [
+        {
+          label: "Le ConfigMap app-config existe",
+          args: ["get", "configmap", "app-config", "-o", "json"],
+          rules: [
+            { path: "data.APP_ENV", equals: "dev", label: "La clé APP_ENV vaut dev" },
+            { path: "data.LOG_LEVEL", equals: "debug", label: "La clé LOG_LEVEL vaut debug" },
+            { path: "data.APP_PORT", equals: "8080", label: "La clé APP_PORT vaut 8080" }
+          ]
+        },
+        {
+          label: "Le Pod test-vol existe",
+          args: ["get", "pod", "test-vol", "-o", "json"],
+          rules: [
+            { path: "spec.volumes.*.configMap.name", equals: "app-config", label: "Le ConfigMap est monté en volume" }
+          ]
+        }
+      ]
     },
     {
       title: "Créer et utiliser un Secret",
@@ -1327,7 +1473,25 @@ EOF</span>
         "Nettoie : <code>kubectl delete pod test-secret test-secret-vol && kubectl delete secret db-creds</code>"
       ],
       validation: "Tu dois pouvoir lire les credentials dans le Pod (via env ou fichier), et vérifier que les valeurs dans le YAML du Secret sont bien encodées en base64.",
-      hint: "Pour monter un Secret en volume, utilise la section <code>volumes</code> avec <code>secret: secretName: db-creds</code> et un <code>volumeMount</code> avec <code>readOnly: true</code>."
+      hint: "Pour monter un Secret en volume, utilise la section <code>volumes</code> avec <code>secret: secretName: db-creds</code> et un <code>volumeMount</code> avec <code>readOnly: true</code>.",
+      check: [
+        {
+          label: "Le Secret db-creds existe",
+          args: ["get", "secret", "db-creds", "-o", "json"],
+          rules: [
+            { path: "type", equals: "Opaque", label: "C'est un Secret de type Opaque" },
+            { path: "data.DB_USER", label: "La clé DB_USER est présente" },
+            { path: "data.DB_PASS", label: "La clé DB_PASS est présente" }
+          ]
+        },
+        {
+          label: "Le Pod test-secret existe",
+          args: ["get", "pod", "test-secret", "-o", "json"],
+          rules: [
+            { path: "spec.containers.*.envFrom.*.secretRef.name", equals: "db-creds", label: "Le Secret est injecté via secretRef" }
+          ]
+        }
+      ]
     }
   ],
   commands: [
@@ -1554,7 +1718,7 @@ curl backend-svc.default.svc         <span class="hl-comment"># Marche aussi</sp
 curl backend-svc.default.svc.cluster.local  <span class="hl-comment"># FQDN complet</span></code></pre><button class="copy-btn">Copier</button></div>
 <h3>Tester le DNS depuis un Pod</h3>
 <div class="code-block"><pre><code><span class="hl-comment"># Lancer un Pod de debug avec les outils réseau</span>
-<span class="hl-cmd">$ kubectl run dns-test <span class="hl-flag">--rm</span> <span class="hl-flag">-it</span> <span class="hl-flag">--image</span>=busybox:1.36 -- /bin/sh</span>
+<span class="hl-cmd">$ kubectl run dns-test <span class="hl-flag">--rm</span> <span class="hl-flag">-it</span> <span class="hl-flag">--image</span>=busybox:1.37 -- /bin/sh</span>
 
 <span class="hl-comment"># Dans le shell du Pod :</span>
 <span class="hl-comment"># Résoudre un nom de Service</span>
@@ -1634,23 +1798,40 @@ cat /etc/resolv.conf
       title: "Exposer un Deployment avec un ClusterIP",
       desc: "Crée un Deployment nginx, expose-le avec un Service ClusterIP, puis vérifie la connectivité depuis un Pod de test.",
       steps: [
-        "Crée un Deployment : <code>kubectl create deployment web --image=nginx:1.27 --replicas=3</code>",
+        "Crée un Deployment : <code>kubectl create deployment web --image=nginx:1.30 --replicas=3</code>",
         "Expose le Deployment en ClusterIP : <code>kubectl expose deployment web --port=80 --name=web-clusterip</code>",
         "Vérifie le Service : <code>kubectl get svc web-clusterip</code> (note l'IP attribuée)",
         "Vérifie les Endpoints : <code>kubectl get endpoints web-clusterip</code> (tu dois voir 3 IPs)",
-        "Teste le DNS depuis un Pod : <code>kubectl run test --rm -it --image=busybox:1.36 -- wget -qO- web-clusterip</code>",
+        "Teste le DNS depuis un Pod : <code>kubectl run test --rm -it --image=busybox:1.37 -- wget -qO- web-clusterip</code>",
         "Scale le Deployment à 5 réplicas : <code>kubectl scale deployment web --replicas=5</code>",
         "Revérifie les Endpoints : <code>kubectl get endpoints web-clusterip</code> (tu dois voir 5 IPs maintenant)",
         "Nettoie : <code>kubectl delete deployment web && kubectl delete svc web-clusterip</code>"
       ],
       validation: "Tu dois pouvoir accéder à la page d'accueil nginx depuis le Pod de test via le nom DNS web-clusterip, et les Endpoints doivent refléter le nombre de réplicas.",
-      hint: "Si wget ne fonctionne pas, assure-toi que les Pods du Deployment sont bien en état Running avec <code>kubectl get pods</code>. Le Service met quelques secondes à détecter les Endpoints."
+      hint: "Si wget ne fonctionne pas, assure-toi que les Pods du Deployment sont bien en état Running avec <code>kubectl get pods</code>. Le Service met quelques secondes à détecter les Endpoints.",
+      check: [
+        {
+          label: "Le Service web-clusterip existe",
+          args: ["get", "svc", "web-clusterip", "-o", "json"],
+          rules: [
+            { path: "spec.type", equals: "ClusterIP", label: "C'est bien un Service de type ClusterIP" },
+            { path: "spec.ports.*.port", equals: 80, label: "Il expose le port 80" }
+          ]
+        },
+        {
+          label: "Les Endpoints sont peuplés",
+          args: ["get", "endpoints", "web-clusterip", "-o", "json"],
+          rules: [
+            { path: "subsets.*.addresses.length", atLeast: 3, label: "Au moins 3 Pods sont derrière le Service" }
+          ]
+        }
+      ]
     },
     {
       title: "Créer un Service NodePort",
       desc: "Expose un Deployment nginx via un NodePort et accède à l'application depuis l'extérieur du cluster.",
       steps: [
-        "Crée un Deployment : <code>kubectl create deployment web-public --image=nginx:1.27 --replicas=2</code>",
+        "Crée un Deployment : <code>kubectl create deployment web-public --image=nginx:1.30 --replicas=2</code>",
         "Expose en NodePort : <code>kubectl expose deployment web-public --type=NodePort --port=80 --name=web-nodeport</code>",
         "Vérifie le Service : <code>kubectl get svc web-nodeport</code> (note le port dans la plage 30000-32767)",
         "Accède au service : <code>minikube service web-nodeport --url</code> puis ouvre l'URL dans ton navigateur",
@@ -1658,7 +1839,17 @@ cat /etc/resolv.conf
         "Nettoie : <code>kubectl delete deployment web-public && kubectl delete svc web-nodeport</code>"
       ],
       validation: "Tu dois pouvoir accéder à la page nginx depuis ton navigateur via le NodePort ou via port-forward.",
-      hint: "Si <code>minikube service</code> ne fonctionne pas, utilise <code>kubectl port-forward svc/web-nodeport 8080:80</code> qui redirige le port 8080 de ta machine locale vers le port 80 du Service."
+      hint: "Si <code>minikube service</code> ne fonctionne pas, utilise <code>kubectl port-forward svc/web-nodeport 8080:80</code> qui redirige le port 8080 de ta machine locale vers le port 80 du Service.",
+      check: [
+        {
+          label: "Le Service web-nodeport existe",
+          args: ["get", "svc", "web-nodeport", "-o", "json"],
+          rules: [
+            { path: "spec.type", equals: "NodePort", label: "C'est bien un Service de type NodePort" },
+            { path: "spec.ports.*.nodePort", atLeast: 30000, label: "Un port de la plage 30000-32767 est attribué" }
+          ]
+        }
+      ]
     }
   ],
   commands: [
@@ -1820,7 +2011,7 @@ cat /etc/resolv.conf
 <span class="hl-key">spec</span>:
   <span class="hl-key">containers</span>:
   - <span class="hl-key">name</span>: <span class="hl-str">app</span>
-    <span class="hl-key">image</span>: <span class="hl-str">nginx:1.27</span>
+    <span class="hl-key">image</span>: <span class="hl-str">nginx:1.30</span>
     <span class="hl-key">volumeMounts</span>:
     - <span class="hl-key">name</span>: <span class="hl-str">host-data</span>
       <span class="hl-key">mountPath</span>: <span class="hl-str">/data</span>
@@ -1905,7 +2096,7 @@ cat /etc/resolv.conf
 <span class="hl-key">spec</span>:
   <span class="hl-key">containers</span>:
   - <span class="hl-key">name</span>: <span class="hl-str">app</span>
-    <span class="hl-key">image</span>: <span class="hl-str">nginx:1.27</span>
+    <span class="hl-key">image</span>: <span class="hl-str">nginx:1.30</span>
     <span class="hl-key">volumeMounts</span>:
     - <span class="hl-key">name</span>: <span class="hl-str">data-vol</span>
       <span class="hl-key">mountPath</span>: <span class="hl-str">/usr/share/nginx/html</span>
@@ -1994,7 +2185,18 @@ cat /etc/resolv.conf
         "Supprime le Pod : <code>kubectl delete pod partage-fichiers</code> (les données disparaissent avec le Pod)"
       ],
       validation: "Tu dois voir les dates s'accumuler dans les logs du conteneur lecteur, prouvant que les deux conteneurs partagent bien le même volume.",
-      hint: "Utilise l'exemple YAML de la section 'emptyDir' ci-dessus. Les deux conteneurs doivent référencer le même nom de volume dans leurs volumeMounts."
+      hint: "Utilise l'exemple YAML de la section 'emptyDir' ci-dessus. Les deux conteneurs doivent référencer le même nom de volume dans leurs volumeMounts.",
+      check: [
+        {
+          label: "Le Pod partage-fichiers existe",
+          args: ["get", "pod", "partage-fichiers", "-o", "json"],
+          rules: [
+            { path: "status.phase", equals: "Running", label: "Le Pod est Running" },
+            { path: "spec.containers.length", atLeast: 2, label: "Il contient bien deux conteneurs" },
+            { path: "spec.volumes.*.emptyDir", label: "Un volume emptyDir est déclaré" }
+          ]
+        }
+      ]
     },
     {
       title: "Créer un PV et un PVC pour du stockage persistant",
@@ -2011,7 +2213,23 @@ cat /etc/resolv.conf
         "Nettoie : <code>kubectl delete pod app-avec-stockage && kubectl delete pvc pvc-data && kubectl delete pv pv-data</code>"
       ],
       validation: "Après avoir supprimé et recréé le Pod, tu dois retrouver le fichier index.html avec le contenu 'Bonjour depuis le PV'. Les données ont survécu à la suppression du Pod.",
-      hint: "Assure-toi que le PV et le PVC ont le même access mode (ReadWriteOnce) et que la capacité du PV est supérieure ou égale à la demande du PVC. Sur minikube, hostPath fonctionne parfaitement pour cet exercice."
+      hint: "Assure-toi que le PV et le PVC ont le même access mode (ReadWriteOnce) et que la capacité du PV est supérieure ou égale à la demande du PVC. Sur minikube, hostPath fonctionne parfaitement pour cet exercice.",
+      check: [
+        {
+          label: "Le PVC pvc-data existe",
+          args: ["get", "pvc", "pvc-data", "-o", "json"],
+          rules: [
+            { path: "status.phase", equals: "Bound", label: "Le PVC est lié à un PersistentVolume" }
+          ]
+        },
+        {
+          label: "Le Pod app-avec-stockage existe",
+          args: ["get", "pod", "app-avec-stockage", "-o", "json"],
+          rules: [
+            { path: "spec.volumes.*.persistentVolumeClaim.claimName", equals: "pvc-data", label: "Le Pod monte bien le PVC pvc-data" }
+          ]
+        }
+      ]
     }
   ],
   commands: [
@@ -2220,7 +2438,7 @@ nom-du-pod.nom-du-service.namespace.svc.cluster.local</code></pre><button class=
     <span class="hl-key">spec</span>:
       <span class="hl-key">containers</span>:
       - <span class="hl-key">name</span>: <span class="hl-str">fluentd</span>
-        <span class="hl-key">image</span>: <span class="hl-str">fluentd:v1.17</span>
+        <span class="hl-key">image</span>: <span class="hl-str">fluentd:v1.18</span>
         <span class="hl-key">resources</span>:
           <span class="hl-key">requests</span>:
             <span class="hl-key">cpu</span>: <span class="hl-str">100m</span>
@@ -2335,7 +2553,7 @@ nom-du-pod.nom-du-service.namespace.svc.cluster.local</code></pre><button class=
 <span class="hl-key">spec</span>:
   <span class="hl-key">containers</span>:
   - <span class="hl-key">name</span>: <span class="hl-str">app</span>
-    <span class="hl-key">image</span>: <span class="hl-str">nginx:1.27</span>
+    <span class="hl-key">image</span>: <span class="hl-str">nginx:1.30</span>
     <span class="hl-key">ports</span>:
     - <span class="hl-key">containerPort</span>: <span class="hl-num">80</span>
     <span class="hl-comment"># Méthode 1 : HTTP GET (appelle un endpoint)</span>
@@ -2385,7 +2603,7 @@ nom-du-pod.nom-du-service.namespace.svc.cluster.local</code></pre><button class=
 <span class="hl-key">spec</span>:
   <span class="hl-key">containers</span>:
   - <span class="hl-key">name</span>: <span class="hl-str">app</span>
-    <span class="hl-key">image</span>: <span class="hl-str">nginx:1.27</span>
+    <span class="hl-key">image</span>: <span class="hl-str">nginx:1.30</span>
     <span class="hl-key">resources</span>:
       <span class="hl-key">requests</span>:
         <span class="hl-key">cpu</span>: <span class="hl-str">100m</span>       <span class="hl-comment"># 100 millicores = 0.1 CPU</span>
@@ -2438,13 +2656,23 @@ nom-du-pod.nom-du-service.namespace.svc.cluster.local</code></pre><button class=
         "Nettoie : <code>kubectl delete job compteur</code>"
       ],
       validation: "Les logs doivent afficher 'Compteur: 1' jusqu'à 'Compteur: 10'. Le Job doit montrer COMPLETIONS 1/1 et le Pod doit être en status Completed.",
-      hint: "N'oublie pas que le <code>restartPolicy</code> pour un Job doit être <code>Never</code> ou <code>OnFailure</code>. Si tu utilises <code>Always</code>, Kubernetes refusera de créer le Job."
+      hint: "N'oublie pas que le <code>restartPolicy</code> pour un Job doit être <code>Never</code> ou <code>OnFailure</code>. Si tu utilises <code>Always</code>, Kubernetes refusera de créer le Job.",
+      check: [
+        {
+          label: "Le Job compteur existe",
+          args: ["get", "job", "compteur", "-o", "json"],
+          rules: [
+            { path: "status.succeeded", atLeast: 1, label: "Le Job s'est terminé avec succès" },
+            { path: "spec.backoffLimit", equals: 3, label: "backoffLimit est fixé à 3" }
+          ]
+        }
+      ]
     },
     {
       title: "Ajouter des probes de santé à un Deployment",
       desc: "Déploie nginx avec des probes liveness et readiness, puis observe le comportement quand une probe échoue.",
       steps: [
-        "Crée un fichier <code>deploy-probes.yaml</code> avec un Deployment nommé <code>web-sain</code> (1 réplica, image <code>nginx:1.27</code>)",
+        "Crée un fichier <code>deploy-probes.yaml</code> avec un Deployment nommé <code>web-sain</code> (1 réplica, image <code>nginx:1.30</code>)",
         "Ajoute une <code>livenessProbe</code> de type httpGet sur le path <code>/</code> port 80, avec <code>initialDelaySeconds: 5</code> et <code>periodSeconds: 5</code>",
         "Ajoute une <code>readinessProbe</code> de type tcpSocket sur le port 80, avec <code>initialDelaySeconds: 3</code> et <code>periodSeconds: 3</code>",
         "Applique : <code>kubectl apply -f deploy-probes.yaml</code>",
@@ -2455,7 +2683,18 @@ nom-du-pod.nom-du-service.namespace.svc.cluster.local</code></pre><button class=
         "Vérifie les événements : <code>kubectl describe pod -l app=web-sain</code> et cherche les messages d'échec de la liveness probe"
       ],
       validation: "Quand la livenessProbe pointe vers un chemin valide, le Pod est stable. Quand elle pointe vers un chemin inexistant, le conteneur est redémarré automatiquement (RESTARTS augmente).",
-      hint: "La livenessProbe de type httpGet considère tout code HTTP entre 200 et 399 comme un succès. Un 404 est un échec qui provoque le redémarrage du conteneur."
+      hint: "La livenessProbe de type httpGet considère tout code HTTP entre 200 et 399 comme un succès. Un 404 est un échec qui provoque le redémarrage du conteneur.",
+      check: [
+        {
+          label: "Le Deployment web-sain existe",
+          args: ["get", "deployment", "web-sain", "-o", "json"],
+          rules: [
+            { path: "spec.template.spec.containers.*.livenessProbe", label: "Une livenessProbe est déclarée" },
+            { path: "spec.template.spec.containers.*.readinessProbe", label: "Une readinessProbe est déclarée" },
+            { path: "spec.template.spec.containers.*.readinessProbe.tcpSocket.port", equals: 80, label: "La readinessProbe interroge le port 80 en TCP" }
+          ]
+        }
+      ]
     }
   ],
   commands: [
@@ -2695,7 +2934,8 @@ nom-du-pod.nom-du-service.namespace.svc.cluster.local</code></pre><button class=
     {
       title: "Gateway API : le successeur d'Ingress",
       content: `<p>L'Ingress API a été le standard pendant des années, mais elle a des limitations importantes : peu de fonctionnalités natives (TLS avancé, redirections, rate limiting reposent sur des annotations spécifiques au controller), pas de séparation claire des responsabilités entre l'admin infrastructure et le développeur.</p>
-<p>La <strong>Gateway API</strong> est le successeur officiel. Elle est plus expressive, plus portable entre controllers, et mieux structurée. Depuis Kubernetes 1.31, elle est <strong>GA</strong> (Generally Available) et recommandée pour les nouveaux projets.</p>
+<p>La <strong>Gateway API</strong> est le successeur officiel. Elle est plus expressive, plus portable entre controllers, et mieux structurée. Ce n'est pas une API intégrée au coeur de Kubernetes : elle s'installe sous forme de CRDs et suit son propre cycle de versions. Son canal Standard est GA depuis la v1.0 (2023) ; la version courante est la <strong>v1.5</strong>.</p>
+<div class="info-box note">L'API Ingress n'est pas supprimée et ne le sera pas de sitôt : elle est gelée, elle ne recevra plus de nouvelles fonctionnalités. Tu croiseras encore beaucoup d'Ingress en production. Apprends les deux, démarre les nouveaux projets en Gateway API.</div>
 <div class="diagram">
   <span class="d-accent">Gateway API</span> -- Séparation des responsabilités
 
@@ -2722,7 +2962,7 @@ nom-du-pod.nom-du-service.namespace.svc.cluster.local</code></pre><button class=
 <li><strong>HTTPRoute</strong> : définit les règles de routage HTTP. Créé par le développeur de l'application</li>
 </ul>
 <div class="code-block"><pre><code><span class="hl-comment"># Installer les CRDs de Gateway API</span>
-<span class="hl-cmd">$ kubectl apply -f https://github.com/kubernetes-sigs/gateway-api/releases/download/v1.2.0/standard-install.yaml</span></code></pre><button class="copy-btn">Copier</button></div>
+<span class="hl-cmd">$ kubectl apply -f https://github.com/kubernetes-sigs/gateway-api/releases/download/v1.5.0/standard-install.yaml</span></code></pre><button class="copy-btn">Copier</button></div>
 <div class="code-block"><pre><code><span class="hl-comment"># Exemple de Gateway</span>
 <span class="hl-key">apiVersion</span>: <span class="hl-str">gateway.networking.k8s.io/v1</span>
 <span class="hl-key">kind</span>: <span class="hl-str">Gateway</span>
@@ -2787,7 +3027,24 @@ nom-du-pod.nom-du-service.namespace.svc.cluster.local</code></pre><button class=
         "Teste : <code>curl http://test.local/</code> (doit afficher la page nginx) et <code>curl http://test.local/api</code> (doit afficher 'API OK')"
       ],
       validation: "http://test.local/ doit afficher la page par défaut de nginx et http://test.local/api doit afficher 'API OK'. La commande <code>kubectl get ingress</code> doit montrer ton Ingress avec une adresse assignée.",
-      hint: "Sur macOS avec le driver Docker, utilise <code>minikube tunnel</code> dans un autre terminal. L'IP sera alors 127.0.0.1. N'oublie pas <code>ingressClassName: nginx</code> dans la spec."
+      hint: "Sur macOS avec le driver Docker, utilise <code>minikube tunnel</code> dans un autre terminal. L'IP sera alors 127.0.0.1. N'oublie pas <code>ingressClassName: nginx</code> dans la spec.",
+      check: [
+        {
+          label: "Le contrôleur Ingress est installé",
+          args: ["get", "pods", "-n", "ingress-nginx", "-o", "json"],
+          rules: [
+            { path: "items.length", atLeast: 1, label: "Le namespace ingress-nginx contient des Pods" }
+          ]
+        },
+        {
+          label: "L'Ingress app-ingress existe",
+          args: ["get", "ingress", "app-ingress", "-o", "json"],
+          rules: [
+            { path: "spec.rules.*.host", equals: "test.local", label: "La règle cible le host test.local" },
+            { path: "spec.rules.*.http.paths.length", atLeast: 2, label: "Deux chemins sont routés (/ et /api)" }
+          ]
+        }
+      ]
     },
     {
       title: "Configurer un routage par host (multi-domaine)",
@@ -2801,7 +3058,17 @@ nom-du-pod.nom-du-service.namespace.svc.cluster.local</code></pre><button class=
         "Vérifie les détails du routage : <code>kubectl describe ingress multi-host-ingress</code>"
       ],
       validation: "Chaque domaine doit router vers le bon service. web.local affiche la page nginx, api.local affiche 'API OK'.",
-      hint: "Chaque règle dans l'Ingress a son propre champ <code>host</code>. Les deux règles sont dans le même objet Ingress mais avec des hosts différents."
+      hint: "Chaque règle dans l'Ingress a son propre champ <code>host</code>. Les deux règles sont dans le même objet Ingress mais avec des hosts différents.",
+      check: [
+        {
+          label: "L'Ingress multi-host-ingress existe",
+          args: ["get", "ingress", "multi-host-ingress", "-o", "json"],
+          rules: [
+            { path: "spec.rules.length", atLeast: 2, label: "Deux règles host sont déclarées" },
+            { path: "spec.rules.*.host", contains: ".local", label: "Les hosts pointent vers des domaines .local" }
+          ]
+        }
+      ]
     }
   ],
   commands: [
@@ -3056,7 +3323,7 @@ nom-du-pod.nom-du-service.namespace.svc.cluster.local</code></pre><button class=
     <span class="hl-key">fsGroup</span>: <span class="hl-num">2000</span>              <span class="hl-comment"># GID appliqué aux volumes montés</span>
   <span class="hl-key">containers</span>:
   - <span class="hl-key">name</span>: <span class="hl-str">app</span>
-    <span class="hl-key">image</span>: <span class="hl-str">nginx:1.27</span>
+    <span class="hl-key">image</span>: <span class="hl-str">nginx:1.30</span>
     <span class="hl-comment"># SecurityContext au niveau du conteneur</span>
     <span class="hl-key">securityContext</span>:
       <span class="hl-key">allowPrivilegeEscalation</span>: <span class="hl-bool">false</span>   <span class="hl-comment"># pas d'escalade de privilèges</span>
@@ -3086,7 +3353,7 @@ nom-du-pod.nom-du-service.namespace.svc.cluster.local</code></pre><button class=
     <span class="hl-key">runAsUser</span>: <span class="hl-num">101</span>       <span class="hl-comment"># utilisateur nginx dans l'image officielle</span>
   <span class="hl-key">containers</span>:
   - <span class="hl-key">name</span>: <span class="hl-str">nginx</span>
-    <span class="hl-key">image</span>: <span class="hl-str">nginxinc/nginx-unprivileged:1.27</span>
+    <span class="hl-key">image</span>: <span class="hl-str">nginxinc/nginx-unprivileged:1.30</span>
     <span class="hl-key">securityContext</span>:
       <span class="hl-key">allowPrivilegeEscalation</span>: <span class="hl-bool">false</span>
       <span class="hl-key">readOnlyRootFilesystem</span>: <span class="hl-bool">true</span>
@@ -3116,6 +3383,41 @@ nom-du-pod.nom-du-service.namespace.svc.cluster.local</code></pre><button class=
 <span class="hl-cmd">$ kubectl exec nginx-securise -- touch /test</span>
 <span class="hl-comment"># touch: /test: Read-only file system</span></code></pre><button class="copy-btn">Copier</button></div>
 <div class="info-box tip">Utilise l'image <code>nginxinc/nginx-unprivileged</code> au lieu de l'image <code>nginx</code> officielle. Elle est préconfigurée pour tourner en tant qu'utilisateur non-root (UID 101) et écoute sur le port 8080 au lieu de 80 (les ports inférieurs à 1024 nécessitent des privilèges root).</div>`
+    },
+    {
+      title: "Pod Security Admission : imposer les règles",
+      content: `<p>Un SecurityContext, c'est bien, mais rien n'oblige personne à en mettre un. Il faut un garde-fou au niveau du cluster : c'est le rôle du <strong>Pod Security Admission</strong> (PSA), activé par défaut depuis Kubernetes 1.25.</p>
+<div class="info-box warning">Si tu tombes sur des tutoriels parlant de <strong>PodSecurityPolicy</strong> (PSP), passe ton chemin : cette API a été supprimée en 1.25. PSA est son remplaçant.</div>
+<p>PSA s'applique <strong>par namespace</strong>, via de simples labels. Il repose sur trois profils standardisés :</p>
+<ul>
+<li><strong>privileged</strong> : aucune restriction. Réservé aux composants d'infrastructure (agents de monitoring, plugins réseau, drivers de stockage).</li>
+<li><strong>baseline</strong> : bloque les escalades de privilèges les plus évidentes (conteneurs privilégiés, hostNetwork, hostPID). Le minimum syndical.</li>
+<li><strong>restricted</strong> : durcissement complet — non-root obligatoire, aucune capability, seccomp actif. La cible pour les applications métier.</li>
+</ul>
+<p>Chaque profil s'applique dans l'un des trois modes suivants :</p>
+<div class="diagram">
+  <span class="d-accent">enforce</span>  ->  le Pod non conforme est <span class="d-accent">refusé</span>
+  <span class="d-accent">audit</span>    ->  le Pod passe, une entrée est écrite dans l'audit log
+  <span class="d-accent">warn</span>     ->  le Pod passe, un avertissement s'affiche dans ton terminal
+</div>
+<div class="code-block"><pre><code><span class="hl-comment"># Appliquer le profil restricted au namespace prod</span>
+<span class="hl-cmd">$ kubectl label namespace prod pod-security.kubernetes.io/enforce=restricted</span>
+<span class="hl-cmd">$ kubectl label namespace prod pod-security.kubernetes.io/warn=restricted</span></code></pre><button class="copy-btn">Copier</button></div>
+<p>Ou directement dans le YAML du namespace :</p>
+<div class="code-block"><pre><code><span class="hl-key">apiVersion</span>: <span class="hl-str">v1</span>
+<span class="hl-key">kind</span>: <span class="hl-str">Namespace</span>
+<span class="hl-key">metadata</span>:
+  <span class="hl-key">name</span>: <span class="hl-str">prod</span>
+  <span class="hl-key">labels</span>:
+    <span class="hl-key">pod-security.kubernetes.io/enforce</span>: <span class="hl-str">restricted</span>
+    <span class="hl-key">pod-security.kubernetes.io/enforce-version</span>: <span class="hl-str">latest</span>
+    <span class="hl-key">pod-security.kubernetes.io/warn</span>: <span class="hl-str">restricted</span></code></pre><button class="copy-btn">Copier</button></div>
+<p>Un Pod sans SecurityContext est alors rejeté, avec le détail de ce qui cloche :</p>
+<div class="code-block"><pre><code><span class="hl-cmd">$ kubectl run test --image=nginx:1.30 -n prod</span>
+Error from server (Forbidden): pods "test" is forbidden: violates PodSecurity
+"restricted:latest": allowPrivilegeEscalation != false, unrestricted capabilities,
+runAsNonRoot != true, seccompProfile type unset</code></pre><button class="copy-btn">Copier</button></div>
+<div class="info-box tip">La bonne façon de déployer PSA sur un cluster existant : commence par <code>warn</code> et <code>audit</code> pour mesurer la casse sans rien bloquer, corrige les manifests fautifs, puis bascule sur <code>enforce</code>.</div>`
     }
   ],
   exercises: [
@@ -3133,7 +3435,25 @@ nom-du-pod.nom-du-service.namespace.svc.cluster.local</code></pre><button class=
         "Nettoie : <code>kubectl delete namespace rbac-test</code>"
       ],
       validation: "Le ServiceAccount 'lecteur' peut lire les Pods dans rbac-test (yes) mais ne peut ni les supprimer (no), ni accéder aux Pods d'un autre namespace (no).",
-      hint: "Le format du --as pour un ServiceAccount est toujours <code>system:serviceaccount:NAMESPACE:NOM</code>. N'oublie pas de spécifier le namespace dans la commande can-i avec -n."
+      hint: "Le format du --as pour un ServiceAccount est toujours <code>system:serviceaccount:NAMESPACE:NOM</code>. N'oublie pas de spécifier le namespace dans la commande can-i avec -n.",
+      check: [
+        {
+          label: "Le Role lecture-seule existe",
+          args: ["get", "role", "lecture-seule", "-n", "rbac-test", "-o", "json"],
+          rules: [
+            { path: "rules.*.resources", contains: "pods", label: "Le Role porte sur les pods" },
+            { path: "rules.*.verbs", contains: "watch", label: "Les verbes get, list et watch sont autorisés" }
+          ]
+        },
+        {
+          label: "Le RoleBinding lecture-binding existe",
+          args: ["get", "rolebinding", "lecture-binding", "-n", "rbac-test", "-o", "json"],
+          rules: [
+            { path: "roleRef.name", equals: "lecture-seule", label: "Il référence le Role lecture-seule" },
+            { path: "subjects.*.name", equals: "lecteur", label: "Il est lié au ServiceAccount lecteur" }
+          ]
+        }
+      ]
     },
     {
       title: "Créer une Network Policy",
@@ -3149,7 +3469,17 @@ nom-du-pod.nom-du-service.namespace.svc.cluster.local</code></pre><button class=
         "Teste depuis frontend : <code>kubectl exec frontend -- wget -qO- --timeout=3 db</code> (doit être bloqué, timeout après 3 secondes)"
       ],
       validation: "Le Pod api peut accéder à db (la page nginx s'affiche), mais le Pod frontend en est empêché par la Network Policy (timeout).",
-      hint: "Le <code>podSelector</code> de la NetworkPolicy cible les Pods à protéger (app: db). La section <code>ingress.from</code> définit qui est autorisé à leur parler (app: api)."
+      hint: "Le <code>podSelector</code> de la NetworkPolicy cible les Pods à protéger (app: db). La section <code>ingress.from</code> définit qui est autorisé à leur parler (app: api).",
+      check: [
+        {
+          label: "La NetworkPolicy db-allow-api existe",
+          args: ["get", "networkpolicy", "db-allow-api", "-o", "json"],
+          rules: [
+            { path: "spec.podSelector.matchLabels.app", equals: "db", label: "Elle cible les Pods app=db" },
+            { path: "spec.ingress.*.from.*.podSelector.matchLabels.app", equals: "api", label: "Seul app=api est autorisé en entrée" }
+          ]
+        }
+      ]
     }
   ],
   commands: [
@@ -3231,16 +3561,784 @@ nom-du-pod.nom-du-service.namespace.svc.cluster.local</code></pre><button class=
     }
   ]
 },
+
 {
   id: 11,
-  title: "Helm et Observabilité",
-  desc: "Gérer les applications avec Helm, personnaliser avec Kustomize, et maîtriser le monitoring et le troubleshooting",
+  title: "Scheduling et placement",
+  desc: "Contrôler sur quel noeud atterrissent tes Pods : nodeSelector, affinités, taints et tolerations",
+  objectives: [
+    "Comprendre comment le scheduler choisit un noeud",
+    "Contraindre le placement avec des labels et nodeSelector",
+    "Utiliser les affinités et anti-affinités pour répartir ou regrouper des Pods",
+    "Réserver des noeuds avec les taints et tolerations",
+    "Étaler une application sur plusieurs zones avec les topology spread constraints"
+  ],
+  sections: [
+    {
+      title: "Comment le scheduler choisit un noeud",
+      content: `<p>Jusqu'ici, tu as créé des Pods sans jamais te demander où ils allaient tourner. Le <strong>kube-scheduler</strong> s'en occupait pour toi. Sur un cluster minikube à un seul noeud, la question ne se pose pas. En production, avec dix ou cent noeuds, elle devient centrale.</p>
+<p>Le scheduler travaille en deux temps :</p>
+<div class="diagram">
+  <span class="d-accent">Pod en attente</span> (spec.nodeName vide)
+         |
+         v
+  +---------------------------------------------+
+  |  1. <span class="d-accent">FILTRAGE</span>                                |
+  |  Quels noeuds sont acceptables ?             |
+  |  - assez de CPU / RAM libre ?                |
+  |  - le nodeSelector correspond ?              |
+  |  - les taints sont-ils tolérés ?             |
+  |  - les ports demandés sont-ils libres ?      |
+  +---------------------------------------------+
+         |
+         v  liste de noeuds candidats
+  +---------------------------------------------+
+  |  2. <span class="d-accent">SCORING</span>                                 |
+  |  Lequel est le meilleur ?                    |
+  |  - noeud le moins chargé                     |
+  |  - image déjà présente localement            |
+  |  - préférences d'affinité respectées         |
+  +---------------------------------------------+
+         |
+         v
+  <span class="d-accent">Le noeud gagnant</span> : le scheduler écrit spec.nodeName
+</div>
+<p>Une fois <code>spec.nodeName</code> renseigné, le kubelet de ce noeud voit le Pod, le récupère et démarre les conteneurs. Le scheduler ne fait rien de plus : il ne déplace jamais un Pod déjà placé.</p>
+<div class="info-box warning">Conséquence importante : si tu ajoutes un label ou changes une affinité après coup, les Pods existants ne bougeront pas. Il faut les recréer (<code>kubectl rollout restart deployment/mon-app</code>) pour que le nouveau placement s'applique.</div>
+<h3>Voir où tournent tes Pods</h3>
+<div class="code-block"><pre><code><span class="hl-cmd">$ kubectl get pods <span class="hl-flag">-o</span> wide</span>
+NAME                     READY   STATUS    RESTARTS   AGE   IP           NODE
+web-7d4b8c9f-abc12       1/1     Running   0          2m    10.244.1.5   worker-1
+web-7d4b8c9f-def34       1/1     Running   0          2m    10.244.2.8   worker-2</code></pre><button class="copy-btn">Copier</button></div>
+<p>Le flag <code>-o wide</code> ajoute la colonne <strong>NODE</strong>. C'est ta première commande de diagnostic dès qu'un problème de placement se pose.</p>
+<h3>Le raccourci brutal : nodeName</h3>
+<p>Tu peux court-circuiter complètement le scheduler en fixant toi-même le noeud :</p>
+<div class="code-block"><pre><code><span class="hl-key">spec</span>:
+  <span class="hl-key">nodeName</span>: <span class="hl-str">worker-2</span>
+  <span class="hl-key">containers</span>:
+  - <span class="hl-key">name</span>: <span class="hl-str">web</span>
+    <span class="hl-key">image</span>: <span class="hl-str">nginx:1.30</span></code></pre><button class="copy-btn">Copier</button></div>
+<div class="info-box warning">À éviter en pratique. Si <code>worker-2</code> est plein, en panne ou n'existe pas, le Pod reste bloqué indéfiniment sans qu'aucun autre noeud soit envisagé. Les mécanismes qui suivent expriment la même intention, mais laissent le scheduler faire son travail.</div>`
+    },
+    {
+      title: "Labels de noeuds et nodeSelector",
+      content: `<p>Les noeuds portent des labels, exactement comme les Pods. Kubernetes en pose automatiquement quelques-uns :</p>
+<div class="code-block"><pre><code><span class="hl-cmd">$ kubectl get nodes <span class="hl-flag">--show-labels</span></span>
+
+<span class="hl-comment"># Les labels standards les plus utiles :</span>
+kubernetes.io/hostname=worker-1
+kubernetes.io/arch=amd64
+kubernetes.io/os=linux
+topology.kubernetes.io/region=eu-west-1
+topology.kubernetes.io/zone=eu-west-1a
+node-role.kubernetes.io/control-plane=</code></pre><button class="copy-btn">Copier</button></div>
+<p>Tu peux ajouter les tiens pour décrire ce que le noeud a de particulier :</p>
+<div class="code-block"><pre><code><span class="hl-cmd">$ kubectl label node worker-2 disktype=ssd</span>
+<span class="hl-cmd">$ kubectl label node worker-3 gpu=true</span>
+
+<span class="hl-comment"># Vérifier</span>
+<span class="hl-cmd">$ kubectl get nodes <span class="hl-flag">-l</span> disktype=ssd</span>
+
+<span class="hl-comment"># Retirer un label (noter le tiret final)</span>
+<span class="hl-cmd">$ kubectl label node worker-2 disktype-</span></code></pre><button class="copy-btn">Copier</button></div>
+<h3>nodeSelector</h3>
+<p>Le <strong>nodeSelector</strong> est la façon la plus simple de contraindre un placement : une correspondance exacte de labels.</p>
+<div class="code-block"><pre><code><span class="hl-key">apiVersion</span>: <span class="hl-str">v1</span>
+<span class="hl-key">kind</span>: <span class="hl-str">Pod</span>
+<span class="hl-key">metadata</span>:
+  <span class="hl-key">name</span>: <span class="hl-str">base-de-donnees</span>
+<span class="hl-key">spec</span>:
+  <span class="hl-key">nodeSelector</span>:
+    <span class="hl-key">disktype</span>: <span class="hl-str">ssd</span>
+  <span class="hl-key">containers</span>:
+  - <span class="hl-key">name</span>: <span class="hl-str">postgres</span>
+    <span class="hl-key">image</span>: <span class="hl-str">postgres:17</span></code></pre><button class="copy-btn">Copier</button></div>
+<p>Le Pod n'ira que sur un noeud portant <code>disktype=ssd</code>. Si plusieurs correspondent, le scheduler choisit le meilleur parmi eux. Si aucun ne correspond, le Pod reste en <strong>Pending</strong>.</p>
+<div class="code-block"><pre><code><span class="hl-cmd">$ kubectl describe pod base-de-donnees</span>
+Events:
+  Warning  FailedScheduling  0/3 nodes are available:
+           3 node(s) didn't match Pod's node affinity/selector.</code></pre><button class="copy-btn">Copier</button></div>
+<div class="info-box tip">C'est le message d'erreur à reconnaître. Un Pod Pending avec « didn't match Pod's node affinity/selector » signifie presque toujours qu'un label manque sur les noeuds, ou qu'il est mal orthographié dans le manifest.</div>
+<p>Le nodeSelector a une limite : il ne sait faire que de l'égalité stricte, et uniquement des règles obligatoires. Pas de « ou », pas de « de préférence ». C'est là qu'interviennent les affinités.</p>`
+    },
+    {
+      title: "Node affinity : des règles plus fines",
+      content: `<p>La <strong>node affinity</strong> fait la même chose que le nodeSelector, mais avec un vrai langage d'expression et deux niveaux de contrainte :</p>
+<ul>
+<li><code>requiredDuringSchedulingIgnoredDuringExecution</code> — une <strong>obligation</strong>. Si aucun noeud ne convient, le Pod reste Pending.</li>
+<li><code>preferredDuringSchedulingIgnoredDuringExecution</code> — une <strong>préférence</strong>. Le scheduler essaie, et se rabat sur autre chose si nécessaire.</li>
+</ul>
+<div class="info-box note">Ces noms à rallonge se lisent en deux morceaux. <code>DuringScheduling</code> : la règle s'applique au moment du placement. <code>IgnoredDuringExecution</code> : une fois le Pod placé, si le noeud perd le label, le Pod n'est pas expulsé.</div>
+<div class="code-block"><pre><code><span class="hl-key">spec</span>:
+  <span class="hl-key">affinity</span>:
+    <span class="hl-key">nodeAffinity</span>:
+      <span class="hl-key">requiredDuringSchedulingIgnoredDuringExecution</span>:
+        <span class="hl-key">nodeSelectorTerms</span>:
+        - <span class="hl-key">matchExpressions</span>:
+          - <span class="hl-key">key</span>: <span class="hl-str">disktype</span>
+            <span class="hl-key">operator</span>: <span class="hl-str">In</span>
+            <span class="hl-key">values</span>: [<span class="hl-str">"ssd"</span>, <span class="hl-str">"nvme"</span>]
+      <span class="hl-key">preferredDuringSchedulingIgnoredDuringExecution</span>:
+      - <span class="hl-key">weight</span>: <span class="hl-num">80</span>
+        <span class="hl-key">preference</span>:
+          <span class="hl-key">matchExpressions</span>:
+          - <span class="hl-key">key</span>: <span class="hl-str">topology.kubernetes.io/zone</span>
+            <span class="hl-key">operator</span>: <span class="hl-str">In</span>
+            <span class="hl-key">values</span>: [<span class="hl-str">"eu-west-1a"</span>]
+  <span class="hl-key">containers</span>:
+  - <span class="hl-key">name</span>: <span class="hl-str">app</span>
+    <span class="hl-key">image</span>: <span class="hl-str">nginx:1.30</span></code></pre><button class="copy-btn">Copier</button></div>
+<p>Traduction en français : « il me faut absolument un noeud avec du SSD ou du NVMe, et si possible dans la zone eu-west-1a ».</p>
+<p>Les opérateurs disponibles : <code>In</code>, <code>NotIn</code>, <code>Exists</code>, <code>DoesNotExist</code>, <code>Gt</code>, <code>Lt</code>. C'est le <code>NotIn</code> qui permet l'anti-affinité de noeud (« surtout pas sur les noeuds de test »).</p>
+<h3>Pod affinity et anti-affinity</h3>
+<p>Les affinités de <strong>Pod</strong> ne raisonnent plus sur les labels des noeuds, mais sur les Pods déjà présents. Deux usages typiques :</p>
+<ul>
+<li><strong>Pod affinity</strong> : « mets-moi près du cache Redis » pour réduire la latence réseau.</li>
+<li><strong>Pod anti-affinity</strong> : « ne mets jamais deux réplicas de mon API sur le même noeud » pour survivre à la perte d'une machine.</li>
+</ul>
+<p>Le cas le plus fréquent, de loin, est le second :</p>
+<div class="code-block"><pre><code><span class="hl-key">spec</span>:
+  <span class="hl-key">replicas</span>: <span class="hl-num">3</span>
+  <span class="hl-key">template</span>:
+    <span class="hl-key">metadata</span>:
+      <span class="hl-key">labels</span>:
+        <span class="hl-key">app</span>: <span class="hl-str">api</span>
+    <span class="hl-key">spec</span>:
+      <span class="hl-key">affinity</span>:
+        <span class="hl-key">podAntiAffinity</span>:
+          <span class="hl-key">requiredDuringSchedulingIgnoredDuringExecution</span>:
+          - <span class="hl-key">labelSelector</span>:
+              <span class="hl-key">matchLabels</span>:
+                <span class="hl-key">app</span>: <span class="hl-str">api</span>
+            <span class="hl-key">topologyKey</span>: <span class="hl-str">kubernetes.io/hostname</span>
+      <span class="hl-key">containers</span>:
+      - <span class="hl-key">name</span>: <span class="hl-str">api</span>
+        <span class="hl-key">image</span>: <span class="hl-str">nginx:1.30</span></code></pre><button class="copy-btn">Copier</button></div>
+<p>Le <code>topologyKey</code> définit le périmètre de la règle. Avec <code>kubernetes.io/hostname</code>, « ensemble » veut dire « sur le même noeud ». Avec <code>topology.kubernetes.io/zone</code>, ça veut dire « dans la même zone de disponibilité ».</p>
+<div class="info-box warning">Avec une anti-affinité <code>required</code> et 3 réplicas sur un cluster de 2 noeuds, le troisième Pod restera Pending pour toujours. C'est le piège classique. En cas de doute, utilise <code>preferred</code>, ou mieux : les topology spread constraints de la section suivante.</div>`
+    },
+    {
+      title: "Taints et tolerations",
+      content: `<p>Les affinités sont vues côté Pod : « je veux tel type de noeud ». Les <strong>taints</strong> prennent le problème dans l'autre sens, côté noeud : « je refuse les Pods, sauf ceux qui ont l'autorisation ».</p>
+<div class="diagram">
+  <span class="d-accent">Affinity</span> : le Pod choisit son noeud
+       Pod  ---- "je veux du SSD" ---->  Node
+
+  <span class="d-accent">Taint</span>    : le noeud repousse les Pods
+       Node ---- "interdit sauf laissez-passer" ----X  Pod
+                                                   |
+       Node <---- "j'ai le laissez-passer" ---- Pod (toleration)
+</div>
+<p>Un taint se pose sur un noeud sous la forme <code>clé=valeur:effet</code>. Trois effets existent :</p>
+<ul>
+<li><strong>NoSchedule</strong> : aucun nouveau Pod sans toleration n'est placé ici. Les Pods déjà présents restent.</li>
+<li><strong>PreferNoSchedule</strong> : le scheduler évite ce noeud, mais l'utilise s'il n'a pas le choix.</li>
+<li><strong>NoExecute</strong> : les Pods sans toleration sont placés ailleurs <em>et</em> ceux déjà présents sont expulsés.</li>
+</ul>
+<div class="code-block"><pre><code><span class="hl-comment"># Réserver un noeud aux traitements GPU</span>
+<span class="hl-cmd">$ kubectl taint node worker-3 gpu=true:NoSchedule</span>
+
+<span class="hl-comment"># Lister les taints d'un noeud</span>
+<span class="hl-cmd">$ kubectl describe node worker-3 | grep Taints</span>
+Taints: gpu=true:NoSchedule
+
+<span class="hl-comment"># Retirer le taint (noter le tiret final)</span>
+<span class="hl-cmd">$ kubectl taint node worker-3 gpu=true:NoSchedule-</span></code></pre><button class="copy-btn">Copier</button></div>
+<p>Côté Pod, la <strong>toleration</strong> est le laissez-passer correspondant :</p>
+<div class="code-block"><pre><code><span class="hl-key">spec</span>:
+  <span class="hl-key">tolerations</span>:
+  - <span class="hl-key">key</span>: <span class="hl-str">gpu</span>
+    <span class="hl-key">operator</span>: <span class="hl-str">Equal</span>
+    <span class="hl-key">value</span>: <span class="hl-str">"true"</span>
+    <span class="hl-key">effect</span>: <span class="hl-str">NoSchedule</span>
+  <span class="hl-key">containers</span>:
+  - <span class="hl-key">name</span>: <span class="hl-str">entrainement</span>
+    <span class="hl-key">image</span>: <span class="hl-str">python:3.13</span></code></pre><button class="copy-btn">Copier</button></div>
+<div class="info-box warning">Une toleration <strong>autorise</strong>, elle n'<strong>attire</strong> pas. Le Pod ci-dessus a le droit d'aller sur worker-3, mais rien ne l'y oblige : il peut très bien atterrir sur un noeud banal. Pour vraiment réserver des machines à une charge de travail, combine un taint sur le noeud (repousser les autres) avec un nodeSelector ou une node affinity sur le Pod (attirer celui-là).</div>
+<h3>Les taints que tu croises déjà</h3>
+<p>Kubernetes en pose lui-même, sans te prévenir :</p>
+<div class="code-block"><pre><code><span class="hl-comment"># Sur les noeuds control plane, pour n'y faire tourner que le système</span>
+node-role.kubernetes.io/control-plane:NoSchedule
+
+<span class="hl-comment"># Posés automatiquement quand un noeud va mal</span>
+node.kubernetes.io/not-ready:NoExecute
+node.kubernetes.io/unreachable:NoExecute
+node.kubernetes.io/disk-pressure:NoSchedule
+node.kubernetes.io/memory-pressure:NoSchedule</code></pre><button class="copy-btn">Copier</button></div>
+<p>C'est ce premier taint qui explique pourquoi, sur un vrai cluster, tes Pods ne tournent jamais sur le control plane. Sur minikube, l'unique noeud n'est pas tainté, sinon plus rien ne pourrait démarrer.</p>
+<div class="info-box tip">Les DaemonSets (module 8) tolèrent automatiquement la plupart de ces taints. C'est logique : un agent de monitoring doit tourner partout, y compris sur un noeud en difficulté — c'est précisément là qu'on a besoin de ses métriques.</div>`
+    },
+    {
+      title: "Topology spread constraints",
+      content: `<p>L'anti-affinité de Pod répond à la question « ensemble ou pas ensemble ». Elle est binaire, et vite frustrante : impossible de dire « je veux mes 6 réplicas répartis équitablement sur mes 3 zones ».</p>
+<p>Les <strong>topology spread constraints</strong> répondent exactement à ça, en mesurant un <strong>écart</strong> toléré entre les zones.</p>
+<div class="code-block"><pre><code><span class="hl-key">spec</span>:
+  <span class="hl-key">topologySpreadConstraints</span>:
+  - <span class="hl-key">maxSkew</span>: <span class="hl-num">1</span>
+    <span class="hl-key">topologyKey</span>: <span class="hl-str">topology.kubernetes.io/zone</span>
+    <span class="hl-key">whenUnsatisfiable</span>: <span class="hl-str">DoNotSchedule</span>
+    <span class="hl-key">labelSelector</span>:
+      <span class="hl-key">matchLabels</span>:
+        <span class="hl-key">app</span>: <span class="hl-str">web</span>
+  <span class="hl-key">containers</span>:
+  - <span class="hl-key">name</span>: <span class="hl-str">web</span>
+    <span class="hl-key">image</span>: <span class="hl-str">nginx:1.30</span></code></pre><button class="copy-btn">Copier</button></div>
+<p>Les quatre champs :</p>
+<ul>
+<li><strong>maxSkew</strong> : l'écart maximal autorisé entre la zone la plus remplie et la moins remplie. Avec <code>1</code>, une répartition 3/3/2 passe, mais 4/2/2 est refusée.</li>
+<li><strong>topologyKey</strong> : le label de noeud qui définit un « groupe » (zone, région, hostname).</li>
+<li><strong>whenUnsatisfiable</strong> : <code>DoNotSchedule</code> (obligation stricte) ou <code>ScheduleAnyway</code> (simple préférence).</li>
+<li><strong>labelSelector</strong> : quels Pods sont comptés dans le calcul.</li>
+</ul>
+<div class="diagram">
+  <span class="d-accent">maxSkew: 1</span> sur 3 zones, 8 réplicas
+
+  zone-a   [P][P][P]      3 Pods
+  zone-b   [P][P][P]      3 Pods
+  zone-c   [P][P]         2 Pods
+                          écart = 3 - 2 = 1   <span class="d-accent">OK</span>
+
+  zone-a   [P][P][P][P]   4 Pods
+  zone-b   [P][P]         2 Pods
+  zone-c   [P][P]         2 Pods
+                          écart = 4 - 2 = 2   <span class="d-accent">REFUSE</span>
+</div>
+<div class="info-box tip">En production, la combinaison qui marche : un spread sur <code>topology.kubernetes.io/zone</code> pour survivre à la perte d'un datacenter, plus un second sur <code>kubernetes.io/hostname</code> pour survivre à la perte d'une machine. Les contraintes s'additionnent.</div>
+<h3>Résumé des outils de placement</h3>
+<div class="diagram">
+  <span class="d-accent">nodeName</span>            placement forcé, aucun filet de sécurité
+  <span class="d-accent">nodeSelector</span>        égalité simple sur un label de noeud
+  <span class="d-accent">nodeAffinity</span>        expressions riches, required ou preferred
+  <span class="d-accent">podAffinity</span>         se placer près de certains Pods
+  <span class="d-accent">podAntiAffinity</span>     s'éloigner de certains Pods
+  <span class="d-accent">taint + toleration</span>  réserver des noeuds à une charge donnée
+  <span class="d-accent">topologySpread</span>      répartir équitablement sur N domaines
+</div>`
+    }
+  ],
+  exercises: [
+    {
+      title: "Placer un Pod avec un label de noeud",
+      desc: "Utilise un label et un nodeSelector pour contraindre le placement, puis observe ce qui se passe quand le label n'existe pas.",
+      steps: [
+        "Regarde les labels de ton noeud minikube : <code>kubectl get nodes --show-labels</code>",
+        "Crée un Pod qui exige un label absent : <code>kubectl run pod-ssd --image=nginx:1.30 --overrides='{\"spec\":{\"nodeSelector\":{\"disktype\":\"ssd\"}}}'</code>",
+        "Vérifie son statut : <code>kubectl get pod pod-ssd</code> (il doit être Pending)",
+        "Lis la cause : <code>kubectl describe pod pod-ssd</code> et repère l'event FailedScheduling",
+        "Pose le label manquant : <code>kubectl label node minikube disktype=ssd</code>",
+        "Observe le Pod démarrer : <code>kubectl get pod pod-ssd -w</code> (Ctrl+C pour arrêter)",
+        "Nettoie : <code>kubectl delete pod pod-ssd</code> et <code>kubectl label node minikube disktype-</code>"
+      ],
+      validation: "Le Pod passe de Pending à Running dès que le label est posé sur le noeud, sans que tu aies eu besoin de le recréer.",
+      hint: "Le scheduler réessaie en permanence de placer les Pods en attente. C'est pour ça que poser le label suffit à débloquer la situation : le Pod n'était pas rejeté, seulement en file d'attente.",
+      check: [
+        {
+          label: "Le noeud porte le label disktype=ssd",
+          args: ["get", "nodes", "-l", "disktype=ssd", "-o", "json"],
+          rules: [
+            { path: "items.length", atLeast: 1, label: "Au moins un noeud porte le label disktype=ssd" }
+          ]
+        },
+        {
+          label: "Le Pod pod-ssd existe",
+          args: ["get", "pod", "pod-ssd", "-o", "json"],
+          rules: [
+            { path: "status.phase", equals: "Running", label: "Le Pod a été planifié et tourne" },
+            { path: "spec.nodeSelector.disktype", equals: "ssd", label: "Il exige bien le nodeSelector disktype=ssd" }
+          ]
+        }
+      ]
+    },
+    {
+      title: "Réserver un noeud avec un taint",
+      desc: "Pose un taint sur ton noeud minikube et constate qu'un Pod sans toleration ne peut plus y être placé.",
+      steps: [
+        "Pose un taint : <code>kubectl taint node minikube reserve=batch:NoSchedule</code>",
+        "Tente un Pod ordinaire : <code>kubectl run pod-simple --image=nginx:1.30</code>",
+        "Vérifie qu'il est Pending : <code>kubectl describe pod pod-simple</code> (event : « node(s) had untolerated taint »)",
+        "Crée un fichier <code>tolere.yaml</code> avec un Pod nommé 'pod-batch' qui déclare une toleration <code>key: reserve</code>, <code>operator: Equal</code>, <code>value: \"batch\"</code>, <code>effect: NoSchedule</code>",
+        "Applique : <code>kubectl apply -f tolere.yaml</code> et vérifie qu'il passe Running",
+        "Retire le taint : <code>kubectl taint node minikube reserve=batch:NoSchedule-</code>",
+        "Constate que pod-simple démarre enfin, puis nettoie : <code>kubectl delete pod pod-simple pod-batch</code>"
+      ],
+      validation: "Seul le Pod portant la toleration démarre tant que le taint est posé. Le retrait du taint débloque l'autre Pod automatiquement.",
+      hint: "Attention au type : <code>value: \"batch\"</code> doit être une chaîne de caractères. Si tu écris <code>value: batch</code> sans guillemets ça passe aussi, mais avec une valeur comme <code>true</code> ou <code>1</code>, l'absence de guillemets provoque une erreur de validation.",
+      check: [
+        {
+          label: "Le Pod pod-batch existe",
+          args: ["get", "pod", "pod-batch", "-o", "json"],
+          rules: [
+            { path: "status.phase", equals: "Running", label: "Le Pod tolère le taint et tourne" },
+            { path: "spec.tolerations.*.key", equals: "reserve", label: "Une toleration sur la clé reserve est déclarée" },
+            { path: "spec.tolerations.*.effect", equals: "NoSchedule", label: "L'effet toléré est NoSchedule" }
+          ]
+        }
+      ]
+    }
+  ],
+  commands: [
+    {
+      prompt: "Quelle commande affiche les Pods du namespace courant avec le noeud sur lequel ils tournent ?",
+      answers: ["kubectl get pods -o wide", "kubectl get pod -o wide", "kubectl get po -o wide"]
+    },
+    {
+      prompt: "Quelle commande ajoute le label 'disktype=ssd' sur le noeud 'worker-1' ?",
+      answers: ["kubectl label node worker-1 disktype=ssd", "kubectl label nodes worker-1 disktype=ssd"]
+    },
+    {
+      prompt: "Quelle commande pose le taint 'gpu=true' avec l'effet NoSchedule sur le noeud 'worker-3' ?",
+      answers: ["kubectl taint node worker-3 gpu=true:NoSchedule", "kubectl taint nodes worker-3 gpu=true:NoSchedule"]
+    },
+    {
+      prompt: "Quelle commande retire le taint 'gpu=true:NoSchedule' du noeud 'worker-3' ?",
+      answers: ["kubectl taint node worker-3 gpu=true:NoSchedule-", "kubectl taint nodes worker-3 gpu=true:NoSchedule-"]
+    }
+  ],
+  quiz: [
+    {
+      question: "Un Pod avec un nodeSelector reste en Pending. Que s'est-il passé ?",
+      options: [
+        "L'image du conteneur n'a pas pu être téléchargée",
+        "Aucun noeud du cluster ne porte le label demandé",
+        "Le Pod a dépassé sa limite de mémoire",
+        "Le namespace n'existe pas"
+      ],
+      correct: 1,
+      explanation: "Le nodeSelector est une contrainte stricte. Si aucun noeud ne porte le label exact, le scheduler ne trouve aucun candidat et le Pod attend indéfiniment. L'event FailedScheduling l'indique : « didn't match Pod's node affinity/selector ». Poser le label sur un noeud débloque le Pod sans le recréer."
+    },
+    {
+      question: "Quelle est la différence entre requiredDuringScheduling et preferredDuringScheduling ?",
+      options: [
+        "required s'applique aux noeuds, preferred aux Pods",
+        "required est vérifié au démarrage, preferred en continu",
+        "required bloque le placement si la règle n'est pas satisfaite, preferred est une simple pondération",
+        "preferred est obsolète depuis Kubernetes 1.30"
+      ],
+      correct: 2,
+      explanation: "Avec <code>required</code>, un Pod dont la règle n'est satisfaite par aucun noeud reste Pending. Avec <code>preferred</code>, la règle donne un bonus de score aux noeuds qui la respectent, mais le Pod sera placé ailleurs si nécessaire. En cas de doute sur un petit cluster, <code>preferred</code> évite les blocages."
+    },
+    {
+      question: "Un noeud porte le taint 'maintenance=true:NoExecute'. Que devient un Pod déjà en cours d'exécution dessus, sans toleration ?",
+      options: [
+        "Il continue de tourner normalement",
+        "Il est expulsé du noeud et replacé ailleurs",
+        "Il passe en statut Pending sur place",
+        "Il est mis en pause jusqu'au retrait du taint"
+      ],
+      correct: 1,
+      explanation: "C'est ce qui distingue <code>NoExecute</code> des deux autres effets. <code>NoSchedule</code> et <code>PreferNoSchedule</code> n'agissent que sur les nouveaux placements et laissent les Pods existants tranquilles. <code>NoExecute</code> expulse en plus les Pods déjà présents qui ne tolèrent pas le taint — c'est le mécanisme utilisé pour vider un noeud en panne."
+    },
+    {
+      question: "Que garantit une toleration posée sur un Pod ?",
+      options: [
+        "Que le Pod sera placé sur le noeud tainté",
+        "Que le Pod a le droit d'être placé sur le noeud tainté, sans y être contraint",
+        "Que le Pod ne sera jamais expulsé du cluster",
+        "Que le Pod aura la priorité sur les autres Pods"
+      ],
+      correct: 1,
+      explanation: "Une toleration lève une interdiction, elle ne crée pas d'attirance. Un Pod qui tolère un taint peut parfaitement être placé sur un noeud banal. Pour réserver réellement des machines à une charge de travail, il faut combiner le taint (qui repousse les autres) avec un nodeSelector ou une node affinity (qui attire celle-là)."
+    },
+    {
+      question: "Avec maxSkew: 1 sur topology.kubernetes.io/zone et 3 zones, quelle répartition de 8 réplicas est acceptée ?",
+      options: [
+        "4 / 2 / 2",
+        "3 / 3 / 2",
+        "5 / 2 / 1",
+        "8 / 0 / 0"
+      ],
+      correct: 1,
+      explanation: "Le skew est l'écart entre la zone la plus remplie et la moins remplie. Pour 3/3/2 l'écart vaut 1, ce qui respecte <code>maxSkew: 1</code>. Pour 4/2/2 il vaut 2, pour 5/2/1 il vaut 4 : les deux sont refusées avec <code>whenUnsatisfiable: DoNotSchedule</code>."
+    }
+  ]
+},
+
+{
+  id: 12,
+  title: "Autoscaling et résilience",
+  desc: "Adapter automatiquement le nombre de Pods à la charge, et protéger tes applications des interruptions",
+  objectives: [
+    "Installer metrics-server et lire la consommation réelle des Pods",
+    "Mettre en place un Horizontal Pod Autoscaler",
+    "Distinguer scaling horizontal, vertical et scaling de noeuds",
+    "Encadrer la consommation d'un namespace avec ResourceQuota et LimitRange",
+    "Protéger la disponibilité d'une application avec un PodDisruptionBudget"
+  ],
+  sections: [
+    {
+      title: "metrics-server : mesurer avant de scaler",
+      content: `<p>Impossible d'adapter automatiquement le nombre de Pods sans savoir combien ils consomment. Kubernetes ne collecte pas ces métriques de lui-même : il faut installer <strong>metrics-server</strong>, un composant qui interroge les kubelets et expose l'API <code>metrics.k8s.io</code>.</p>
+<div class="diagram">
+  kubelet (worker-1) --+
+  kubelet (worker-2) --+--> <span class="d-accent">metrics-server</span> --> API metrics.k8s.io
+  kubelet (worker-3) --+                              |
+                                                      +--> kubectl top
+                                                      +--> <span class="d-accent">HPA</span>
+</div>
+<div class="code-block"><pre><code><span class="hl-comment"># Sur minikube, c'est un simple addon</span>
+<span class="hl-cmd">$ minikube addons enable metrics-server</span>
+
+<span class="hl-comment"># Sur un vrai cluster</span>
+<span class="hl-cmd">$ kubectl apply <span class="hl-flag">-f</span> https://github.com/kubernetes-sigs/metrics-server/releases/latest/download/components.yaml</span>
+
+<span class="hl-comment"># Vérifier qu'il tourne</span>
+<span class="hl-cmd">$ kubectl get deployment metrics-server <span class="hl-flag">-n</span> kube-system</span></code></pre><button class="copy-btn">Copier</button></div>
+<p>Une fois en place, deux commandes deviennent disponibles :</p>
+<div class="code-block"><pre><code><span class="hl-cmd">$ kubectl top nodes</span>
+NAME       CPU(cores)   CPU%   MEMORY(bytes)   MEMORY%
+minikube   241m         12%    1120Mi          28%
+
+<span class="hl-cmd">$ kubectl top pods</span>
+NAME                   CPU(cores)   MEMORY(bytes)
+web-7d4b8c9f-abc12     2m           14Mi
+api-5f9c7d8b-def34     158m         92Mi</code></pre><button class="copy-btn">Copier</button></div>
+<div class="info-box note">Le CPU s'exprime en <strong>millicores</strong> : <code>1000m</code> = 1 coeur complet, <code>250m</code> = un quart de coeur. La mémoire s'exprime en octets, avec les suffixes <code>Ki</code>, <code>Mi</code>, <code>Gi</code> (puissances de 1024). Attention à ne pas confondre <code>Mi</code> (mébioctet, 1048576 octets) et <code>M</code> (mégaoctet, 1000000 octets).</div>
+<div class="info-box warning">Il faut une à deux minutes après l'installation pour que les premières métriques remontent. Si <code>kubectl top</code> répond « metrics not available yet », patiente avant de conclure à une panne.</div>`
+    },
+    {
+      title: "Horizontal Pod Autoscaler",
+      content: `<p>L'<strong>HPA</strong> ajuste automatiquement le nombre de réplicas d'un Deployment en fonction d'une métrique. C'est une boucle de contrôle qui, toutes les 15 secondes, compare la consommation observée à une cible et corrige le tir.</p>
+<div class="info-box warning">L'HPA ne fonctionne que si les Pods déclarent des <code>resources.requests</code>. Le pourcentage cible se calcule <strong>par rapport à la request</strong>, pas par rapport à la capacité du noeud. Sans request CPU, l'HPA reste bloqué avec la cible <code>&lt;unknown&gt;</code>.</div>
+<div class="code-block"><pre><code><span class="hl-comment"># Le Deployment doit déclarer ses requests</span>
+<span class="hl-key">spec</span>:
+  <span class="hl-key">containers</span>:
+  - <span class="hl-key">name</span>: <span class="hl-str">api</span>
+    <span class="hl-key">image</span>: <span class="hl-str">nginx:1.30</span>
+    <span class="hl-key">resources</span>:
+      <span class="hl-key">requests</span>:
+        <span class="hl-key">cpu</span>: <span class="hl-str">100m</span>
+        <span class="hl-key">memory</span>: <span class="hl-str">64Mi</span>
+      <span class="hl-key">limits</span>:
+        <span class="hl-key">cpu</span>: <span class="hl-str">500m</span>
+        <span class="hl-key">memory</span>: <span class="hl-str">128Mi</span></code></pre><button class="copy-btn">Copier</button></div>
+<h3>Créer un HPA</h3>
+<div class="code-block"><pre><code><span class="hl-comment"># En impératif, le plus rapide</span>
+<span class="hl-cmd">$ kubectl autoscale deployment api <span class="hl-flag">--min</span>=2 <span class="hl-flag">--max</span>=10 <span class="hl-flag">--cpu-percent</span>=70</span>
+
+<span class="hl-cmd">$ kubectl get hpa</span>
+NAME   REFERENCE         TARGETS   MINPODS   MAXPODS   REPLICAS
+api    Deployment/api    12%/70%   2         10        2</code></pre><button class="copy-btn">Copier</button></div>
+<p>La colonne TARGETS se lit « consommation actuelle / cible ». Ici les Pods utilisent 12% de leur request CPU, largement sous les 70% visés : l'HPA reste au minimum de 2 réplicas.</p>
+<p>Le YAML équivalent, en version <code>autoscaling/v2</code> — la seule à utiliser aujourd'hui :</p>
+<div class="code-block"><pre><code><span class="hl-key">apiVersion</span>: <span class="hl-str">autoscaling/v2</span>
+<span class="hl-key">kind</span>: <span class="hl-str">HorizontalPodAutoscaler</span>
+<span class="hl-key">metadata</span>:
+  <span class="hl-key">name</span>: <span class="hl-str">api</span>
+<span class="hl-key">spec</span>:
+  <span class="hl-key">scaleTargetRef</span>:
+    <span class="hl-key">apiVersion</span>: <span class="hl-str">apps/v1</span>
+    <span class="hl-key">kind</span>: <span class="hl-str">Deployment</span>
+    <span class="hl-key">name</span>: <span class="hl-str">api</span>
+  <span class="hl-key">minReplicas</span>: <span class="hl-num">2</span>
+  <span class="hl-key">maxReplicas</span>: <span class="hl-num">10</span>
+  <span class="hl-key">metrics</span>:
+  - <span class="hl-key">type</span>: <span class="hl-str">Resource</span>
+    <span class="hl-key">resource</span>:
+      <span class="hl-key">name</span>: <span class="hl-str">cpu</span>
+      <span class="hl-key">target</span>:
+        <span class="hl-key">type</span>: <span class="hl-str">Utilization</span>
+        <span class="hl-key">averageUtilization</span>: <span class="hl-num">70</span>
+  - <span class="hl-key">type</span>: <span class="hl-str">Resource</span>
+    <span class="hl-key">resource</span>:
+      <span class="hl-key">name</span>: <span class="hl-str">memory</span>
+      <span class="hl-key">target</span>:
+        <span class="hl-key">type</span>: <span class="hl-str">Utilization</span>
+        <span class="hl-key">averageUtilization</span>: <span class="hl-num">80</span></code></pre><button class="copy-btn">Copier</button></div>
+<p>Avec plusieurs métriques, l'HPA calcule le nombre de réplicas pour chacune et retient <strong>le plus grand</strong>. La règle est prudente : mieux vaut trop de Pods que pas assez.</p>
+<h3>La formule</h3>
+<div class="diagram">
+  réplicas souhaités  = plafond( réplicas actuels   x  <span class="d-accent">valeur mesurée</span>  )
+                                                       ------------------
+                                                        <span class="d-accent">valeur cible</span>
+
+  Exemple : 3 Pods à 90% de CPU, cible 70%
+            3 x (90 / 70) = 3.85  ->  <span class="d-accent">4 Pods</span>
+</div>
+<h3>Éviter l'effet yo-yo</h3>
+<p>Sans garde-fou, un HPA peut osciller : il monte, la charge retombe, il descend, la charge remonte. Le champ <code>behavior</code> permet de calmer le jeu.</p>
+<div class="code-block"><pre><code><span class="hl-key">spec</span>:
+  <span class="hl-key">behavior</span>:
+    <span class="hl-key">scaleDown</span>:
+      <span class="hl-key">stabilizationWindowSeconds</span>: <span class="hl-num">300</span>   <span class="hl-comment"># attendre 5 min avant de réduire</span>
+      <span class="hl-key">policies</span>:
+      - <span class="hl-key">type</span>: <span class="hl-str">Percent</span>
+        <span class="hl-key">value</span>: <span class="hl-num">50</span>                      <span class="hl-comment"># au plus -50% de Pods</span>
+        <span class="hl-key">periodSeconds</span>: <span class="hl-num">60</span>
+    <span class="hl-key">scaleUp</span>:
+      <span class="hl-key">stabilizationWindowSeconds</span>: <span class="hl-num">0</span>     <span class="hl-comment"># monter immédiatement</span></code></pre><button class="copy-btn">Copier</button></div>
+<div class="info-box tip">Par défaut Kubernetes attend déjà 5 minutes avant toute réduction, mais monte sans délai. Cette asymétrie est volontaire : rater un pic de trafic coûte plus cher que de garder quelques Pods en trop pendant cinq minutes.</div>`
+    },
+    {
+      title: "Les autres formes de scaling",
+      content: `<p>L'HPA ajoute des Pods. Ce n'est qu'une des trois dimensions du problème.</p>
+<div class="diagram">
+  <span class="d-accent">Horizontal</span> (HPA)       plus de Pods, même taille
+       [P]  ->  [P][P][P]
+
+  <span class="d-accent">Vertical</span> (VPA)         même nombre de Pods, plus gros
+       [p]  ->  [ P ]
+
+  <span class="d-accent">Cluster</span> (CA)           plus de noeuds pour accueillir les Pods
+       [node]  ->  [node][node]
+</div>
+<h3>Vertical Pod Autoscaler</h3>
+<p>Le <strong>VPA</strong> ajuste les <code>requests</code> et <code>limits</code> d'un Pod plutôt que leur nombre. Ce n'est pas un composant du coeur de Kubernetes : il s'installe séparément.</p>
+<p>Son mode le plus utile est <code>updateMode: "Off"</code>, qui ne modifie rien mais publie ses recommandations. Tu obtiens une réponse chiffrée à la question « quelles requests devrais-je vraiment poser sur cette application ? », sans risque.</p>
+<div class="info-box warning">VPA et HPA sur la même métrique se marchent dessus : l'un fait grossir les Pods, ce qui fait baisser le pourcentage d'utilisation, ce qui pousse l'autre à en supprimer. Utilise l'HPA sur le CPU et le VPA sur la mémoire, ou le VPA en mode recommandation seule.</div>
+<h3>Cluster Autoscaler</h3>
+<p>Si l'HPA veut créer des Pods mais qu'aucun noeud n'a de place, les Pods restent Pending. Le <strong>Cluster Autoscaler</strong> détecte ces Pods et demande une nouvelle machine au fournisseur cloud. Il en supprime aussi quand des noeuds restent sous-utilisés.</p>
+<p>Sans surprise, ça n'existe pas sur minikube : le nombre de noeuds y est fixe.</p>
+<h3>Redimensionner un Pod sans le redémarrer</h3>
+<p>Historiquement, changer les <code>resources</code> d'un Pod impliquait de le recréer. Kubernetes sait désormais modifier CPU et mémoire d'un conteneur en place, sans redémarrage :</p>
+<div class="code-block"><pre><code><span class="hl-cmd">$ kubectl get pod api-abc12 <span class="hl-flag">--subresource</span>=resize</span></code></pre><button class="copy-btn">Copier</button></div>
+<p>Utile pour ajuster une application à état sans interrompre le service. Toutes les applications ne le supportent pas : une JVM qui a fixé sa heap au démarrage ne profitera pas de la mémoire ajoutée.</p>`
+    },
+    {
+      title: "ResourceQuota et LimitRange",
+      content: `<p>L'autoscaling sait faire grossir une application. Encore faut-il que personne ne puisse consommer tout le cluster. Deux objets encadrent ça, tous les deux <strong>par namespace</strong>.</p>
+<h3>ResourceQuota : le plafond du namespace</h3>
+<p>Une <strong>ResourceQuota</strong> fixe un budget global : combien de CPU, de mémoire, et combien d'objets de chaque type.</p>
+<div class="code-block"><pre><code><span class="hl-key">apiVersion</span>: <span class="hl-str">v1</span>
+<span class="hl-key">kind</span>: <span class="hl-str">ResourceQuota</span>
+<span class="hl-key">metadata</span>:
+  <span class="hl-key">name</span>: <span class="hl-str">quota-equipe</span>
+  <span class="hl-key">namespace</span>: <span class="hl-str">dev</span>
+<span class="hl-key">spec</span>:
+  <span class="hl-key">hard</span>:
+    <span class="hl-key">requests.cpu</span>: <span class="hl-str">"4"</span>
+    <span class="hl-key">requests.memory</span>: <span class="hl-str">8Gi</span>
+    <span class="hl-key">limits.cpu</span>: <span class="hl-str">"8"</span>
+    <span class="hl-key">limits.memory</span>: <span class="hl-str">16Gi</span>
+    <span class="hl-key">pods</span>: <span class="hl-str">"30"</span>
+    <span class="hl-key">persistentvolumeclaims</span>: <span class="hl-str">"10"</span>
+    <span class="hl-key">services.loadbalancers</span>: <span class="hl-str">"2"</span></code></pre><button class="copy-btn">Copier</button></div>
+<div class="code-block"><pre><code><span class="hl-cmd">$ kubectl describe quota <span class="hl-flag">-n</span> dev</span>
+Name:              quota-equipe
+Resource           Used   Hard
+--------           ----   ----
+pods               12     30
+requests.cpu       1200m  4
+requests.memory    3Gi    8Gi</code></pre><button class="copy-btn">Copier</button></div>
+<div class="info-box warning">Dès qu'une ResourceQuota portant sur le CPU ou la mémoire existe dans un namespace, <strong>tout Pod créé sans requests ni limits est refusé</strong>. Kubernetes ne peut pas décompter un budget qu'il ne connaît pas. C'est une source classique de « ça marchait en dev, ça ne passe plus en prod ».</div>
+<h3>LimitRange : les valeurs par défaut</h3>
+<p>Le <strong>LimitRange</strong> répond exactement à ce problème : il pose des valeurs par défaut sur les Pods qui n'en déclarent pas, et fixe des bornes.</p>
+<div class="code-block"><pre><code><span class="hl-key">apiVersion</span>: <span class="hl-str">v1</span>
+<span class="hl-key">kind</span>: <span class="hl-str">LimitRange</span>
+<span class="hl-key">metadata</span>:
+  <span class="hl-key">name</span>: <span class="hl-str">defauts-conteneurs</span>
+  <span class="hl-key">namespace</span>: <span class="hl-str">dev</span>
+<span class="hl-key">spec</span>:
+  <span class="hl-key">limits</span>:
+  - <span class="hl-key">type</span>: <span class="hl-str">Container</span>
+    <span class="hl-key">default</span>:                 <span class="hl-comment"># limits si non déclarées</span>
+      <span class="hl-key">cpu</span>: <span class="hl-str">500m</span>
+      <span class="hl-key">memory</span>: <span class="hl-str">512Mi</span>
+    <span class="hl-key">defaultRequest</span>:          <span class="hl-comment"># requests si non déclarées</span>
+      <span class="hl-key">cpu</span>: <span class="hl-str">100m</span>
+      <span class="hl-key">memory</span>: <span class="hl-str">128Mi</span>
+    <span class="hl-key">max</span>:                     <span class="hl-comment"># plafond par conteneur</span>
+      <span class="hl-key">cpu</span>: <span class="hl-str">"2"</span>
+      <span class="hl-key">memory</span>: <span class="hl-str">4Gi</span>
+    <span class="hl-key">min</span>:
+      <span class="hl-key">cpu</span>: <span class="hl-str">10m</span>
+      <span class="hl-key">memory</span>: <span class="hl-str">16Mi</span></code></pre><button class="copy-btn">Copier</button></div>
+<div class="info-box tip">La combinaison qui marche en production : un LimitRange pour que rien ne parte sans requests, plus une ResourceQuota pour plafonner l'ensemble. Le LimitRange rend la quota utilisable au quotidien.</div>`
+    },
+    {
+      title: "PodDisruptionBudget",
+      content: `<p>Ton application tourne avec 5 réplicas bien répartis. Un administrateur lance <code>kubectl drain</code> sur un noeud pour le mettre à jour. Combien de tes Pods disparaissent en même temps ? Sans garde-fou, potentiellement tous ceux qui étaient sur ce noeud, d'un coup.</p>
+<p>Le <strong>PodDisruptionBudget</strong> (PDB) fixe une limite au nombre de Pods qu'une opération volontaire a le droit d'interrompre simultanément.</p>
+<div class="info-box note">Un PDB ne protège que des interruptions <strong>volontaires</strong> : drain d'un noeud, mise à jour de cluster, éviction par un outil. Il ne peut rien contre un crash applicatif, une panne matérielle ou un OOMKill — Kubernetes ne les a pas décidés.</div>
+<div class="code-block"><pre><code><span class="hl-key">apiVersion</span>: <span class="hl-str">policy/v1</span>
+<span class="hl-key">kind</span>: <span class="hl-str">PodDisruptionBudget</span>
+<span class="hl-key">metadata</span>:
+  <span class="hl-key">name</span>: <span class="hl-str">api-pdb</span>
+<span class="hl-key">spec</span>:
+  <span class="hl-key">minAvailable</span>: <span class="hl-num">3</span>          <span class="hl-comment"># ou maxUnavailable: 1</span>
+  <span class="hl-key">selector</span>:
+    <span class="hl-key">matchLabels</span>:
+      <span class="hl-key">app</span>: <span class="hl-str">api</span></code></pre><button class="copy-btn">Copier</button></div>
+<p>Deux façons d'exprimer la contrainte, à ne jamais combiner :</p>
+<ul>
+<li><strong>minAvailable</strong> : le nombre (ou pourcentage) de Pods qui doivent rester disponibles.</li>
+<li><strong>maxUnavailable</strong> : le nombre (ou pourcentage) de Pods qu'on accepte de perdre.</li>
+</ul>
+<div class="code-block"><pre><code><span class="hl-cmd">$ kubectl get pdb</span>
+NAME      MIN AVAILABLE   MAX UNAVAILABLE   ALLOWED DISRUPTIONS
+api-pdb   3               N/A               2</code></pre><button class="copy-btn">Copier</button></div>
+<p>ALLOWED DISRUPTIONS est la colonne à surveiller : c'est le nombre de Pods qui peuvent être évincés maintenant. À <code>0</code>, un <code>kubectl drain</code> restera bloqué en attendant que la situation s'améliore.</p>
+<div class="info-box warning">Le piège classique : <code>minAvailable: 3</code> sur un Deployment à 3 réplicas. Aucun Pod ne peut jamais être évincé, et le moindre drain bloque indéfiniment. Utilise un pourcentage, ou laisse au moins un réplica de marge.</div>
+<h3>La panoplie complète de la résilience</h3>
+<div class="diagram">
+  <span class="d-accent">replicas &gt; 1</span>            survivre à la perte d'un Pod
+  <span class="d-accent">probes</span>                  ne router que vers les Pods sains
+  <span class="d-accent">requests / limits</span>       éviter qu'un voisin bruyant t'affame
+  <span class="d-accent">topologySpread</span>          survivre à la perte d'un noeud ou d'une zone
+  <span class="d-accent">PodDisruptionBudget</span>     survivre aux opérations de maintenance
+  <span class="d-accent">HPA</span>                     survivre aux pics de trafic
+</div>
+<p>Aucun de ces mécanismes ne suffit seul. Une application vraiment résiliente les combine tous.</p>`
+    }
+  ],
+  exercises: [
+    {
+      title: "Mettre en place un HPA et déclencher une montée en charge",
+      desc: "Active metrics-server, crée un Deployment avec des requests, puis génère du trafic pour voir l'HPA réagir.",
+      steps: [
+        "Active l'addon : <code>minikube addons enable metrics-server</code>, puis attends une minute",
+        "Vérifie qu'il répond : <code>kubectl top nodes</code>",
+        "Déploie l'application de test officielle : <code>kubectl create deployment php-apache --image=registry.k8s.io/hpa-example</code>",
+        "Pose des requests, indispensables à l'HPA : <code>kubectl set resources deployment php-apache --requests=cpu=200m --limits=cpu=500m</code>",
+        "Expose-la : <code>kubectl expose deployment php-apache --port=80</code>",
+        "Crée l'HPA : <code>kubectl autoscale deployment php-apache --min=1 --max=10 --cpu-percent=50</code>",
+        "Observe l'état initial : <code>kubectl get hpa -w</code> (garde ce terminal ouvert)",
+        "Dans un second terminal, génère de la charge : <code>kubectl run charge --rm -it --image=busybox:1.37 -- /bin/sh -c \"while true; do wget -q -O- http://php-apache; done\"</code>",
+        "Reviens sur le premier terminal : les TARGETS montent, puis REPLICAS augmente",
+        "Coupe la charge (Ctrl+C) et observe la redescente après environ 5 minutes",
+        "Nettoie : <code>kubectl delete hpa,deployment,service php-apache</code>"
+      ],
+      validation: "La colonne TARGETS dépasse 50%, le nombre de REPLICAS augmente automatiquement, puis redescend une fois la charge arrêtée.",
+      hint: "Si TARGETS affiche <code>&lt;unknown&gt;/50%</code>, c'est presque toujours l'une de deux causes : metrics-server n'est pas encore prêt, ou le Deployment n'a pas de request CPU. Vérifie avec <code>kubectl describe hpa php-apache</code>.",
+      check: [
+        {
+          label: "L'HPA php-apache existe",
+          args: ["get", "hpa", "php-apache", "-o", "json"],
+          rules: [
+            { path: "spec.minReplicas", equals: 1, label: "Le minimum est fixé à 1 réplica" },
+            { path: "spec.maxReplicas", equals: 10, label: "Le maximum est fixé à 10 réplicas" },
+            { path: "spec.metrics.*.resource.target.averageUtilization", equals: 50, label: "La cible est 50% de CPU" }
+          ]
+        },
+        {
+          label: "Le Deployment php-apache a des requests",
+          args: ["get", "deployment", "php-apache", "-o", "json"],
+          rules: [
+            { path: "spec.template.spec.containers.*.resources.requests.cpu", label: "Des requests CPU sont posées, sans quoi l'HPA ne peut rien mesurer" }
+          ]
+        }
+      ]
+    },
+    {
+      title: "Encadrer un namespace avec quota et LimitRange",
+      desc: "Pose un budget sur un namespace, constate le refus d'un Pod sans requests, puis débloque la situation avec un LimitRange.",
+      steps: [
+        "Crée le namespace : <code>kubectl create namespace bac-a-sable</code>",
+        "Crée un fichier <code>quota.yaml</code> avec une ResourceQuota limitant <code>requests.cpu</code> à <code>1</code>, <code>requests.memory</code> à <code>1Gi</code> et <code>pods</code> à <code>5</code>",
+        "Applique : <code>kubectl apply -f quota.yaml -n bac-a-sable</code>",
+        "Tente un Pod sans requests : <code>kubectl run test --image=nginx:1.30 -n bac-a-sable</code> (il doit être refusé)",
+        "Lis le message d'erreur : il mentionne « must specify limits.cpu, requests.cpu »",
+        "Crée un fichier <code>limitrange.yaml</code> avec un LimitRange de type <code>Container</code> posant <code>defaultRequest</code> cpu=100m memory=128Mi et <code>default</code> cpu=200m memory=256Mi",
+        "Applique-le, puis relance <code>kubectl run test --image=nginx:1.30 -n bac-a-sable</code> : le Pod passe",
+        "Vérifie les valeurs injectées : <code>kubectl get pod test -n bac-a-sable -o jsonpath='{.spec.containers[0].resources}'</code>",
+        "Consulte la consommation du budget : <code>kubectl describe quota -n bac-a-sable</code>",
+        "Nettoie : <code>kubectl delete namespace bac-a-sable</code>"
+      ],
+      validation: "Le premier Pod est refusé par la quota. Après application du LimitRange, le même Pod est accepté et porte automatiquement les requests et limits par défaut.",
+      hint: "L'ordre compte : le LimitRange complète le manifest du Pod avant que la ResourceQuota ne le contrôle. Sans LimitRange, la quota n'a rien à décompter et rejette le Pod.",
+      check: [
+        {
+          label: "Le namespace bac-a-sable a un quota",
+          args: ["get", "resourcequota", "-n", "bac-a-sable", "-o", "json"],
+          rules: [
+            { path: "items.length", atLeast: 1, label: "Une ResourceQuota encadre le namespace" },
+            { path: "items.*.spec.hard.pods", equals: "5", label: "Le quota limite le nombre de Pods à 5" }
+          ]
+        },
+        {
+          label: "Le namespace bac-a-sable a un LimitRange",
+          args: ["get", "limitrange", "-n", "bac-a-sable", "-o", "json"],
+          rules: [
+            { path: "items.length", atLeast: 1, label: "Un LimitRange fournit les valeurs par défaut" }
+          ]
+        }
+      ]
+    }
+  ],
+  commands: [
+    {
+      prompt: "Quelle commande affiche la consommation CPU et mémoire des noeuds du cluster ?",
+      answers: ["kubectl top nodes", "kubectl top node"]
+    },
+    {
+      prompt: "Quelle commande crée un HPA sur le Deployment 'api' entre 2 et 10 réplicas avec une cible de 70% de CPU ?",
+      answers: [
+        "kubectl autoscale deployment api --min=2 --max=10 --cpu-percent=70",
+        "kubectl autoscale deployment/api --min=2 --max=10 --cpu-percent=70"
+      ]
+    },
+    {
+      prompt: "Quelle commande liste les HorizontalPodAutoscalers du namespace courant ?",
+      answers: ["kubectl get hpa", "kubectl get horizontalpodautoscalers", "kubectl get horizontalpodautoscaler"]
+    },
+    {
+      prompt: "Quelle commande affiche la consommation détaillée des quotas du namespace 'dev' ?",
+      answers: ["kubectl describe quota -n dev", "kubectl describe resourcequota -n dev", "kubectl describe quota --namespace=dev"]
+    }
+  ],
+  quiz: [
+    {
+      question: "Un HPA affiche TARGETS à &lt;unknown&gt;/70%. Quelle est la cause la plus probable ?",
+      options: [
+        "Le Deployment a trop de réplicas",
+        "Les Pods ne déclarent pas de resources.requests, ou metrics-server est absent",
+        "Le namespace n'a pas de ResourceQuota",
+        "La version autoscaling/v2 n'est pas activée"
+      ],
+      correct: 1,
+      explanation: "L'HPA calcule un pourcentage d'utilisation par rapport à la <code>request</code> du conteneur. Sans request, il n'a pas de dénominateur et affiche <code>&lt;unknown&gt;</code>. L'autre cause fréquente est l'absence de metrics-server, qui fournit les mesures. <code>kubectl describe hpa</code> précise laquelle des deux."
+    },
+    {
+      question: "Un Deployment tourne avec 3 Pods à 90% de CPU, la cible de l'HPA est 70%. Combien de réplicas l'HPA va-t-il demander ?",
+      options: ["3", "4", "6", "10"],
+      correct: 1,
+      explanation: "La formule est : réplicas actuels × (valeur mesurée / valeur cible), arrondi à l'entier supérieur. Ici 3 × (90 / 70) = 3,857 qui donne 4 réplicas. L'HPA arrondit toujours vers le haut pour ne pas rester sous-dimensionné."
+    },
+    {
+      question: "Une ResourceQuota limitant requests.cpu existe dans un namespace. Que devient un Pod créé sans aucune requests ?",
+      options: [
+        "Il démarre avec des requests à zéro",
+        "Il est refusé à la création",
+        "Il démarre mais sera évincé en premier sous pression",
+        "Il hérite automatiquement des requests du namespace"
+      ],
+      correct: 1,
+      explanation: "Dès qu'une quota porte sur le CPU ou la mémoire, Kubernetes exige que chaque Pod déclare les valeurs correspondantes : sans elles, il ne peut pas décompter le budget. Le Pod est rejeté par l'admission controller. Un LimitRange dans le même namespace résout le problème en injectant des valeurs par défaut."
+    },
+    {
+      question: "À quoi sert un PodDisruptionBudget ?",
+      options: [
+        "Limiter le budget financier d'un namespace",
+        "Garantir un nombre minimum de Pods disponibles pendant les interruptions volontaires",
+        "Redémarrer automatiquement les Pods en échec",
+        "Répartir les Pods sur plusieurs zones"
+      ],
+      correct: 1,
+      explanation: "Le PDB s'applique aux interruptions <strong>volontaires</strong> : drain d'un noeud, mise à jour du cluster, éviction par un outil. Il bloque l'opération tant qu'elle ferait passer sous le seuil. Il ne protège pas des pannes involontaires (crash, panne matérielle, OOMKill), sur lesquelles Kubernetes n'a pas la main."
+    },
+    {
+      question: "Pourquoi ne faut-il pas faire piloter la même métrique par un HPA et un VPA ?",
+      options: [
+        "Les deux composants ne peuvent pas être installés ensemble",
+        "Le VPA agrandit les Pods, ce qui fait baisser le taux d'utilisation et pousse l'HPA à en supprimer",
+        "Le VPA nécessite une version de Kubernetes plus récente",
+        "L'HPA ne fonctionne que sur le CPU et le VPA que sur la mémoire"
+      ],
+      correct: 1,
+      explanation: "Les deux boucles se combattent. Le VPA augmente les requests, ce qui fait mécaniquement chuter le pourcentage d'utilisation observé par l'HPA, qui réduit alors le nombre de Pods — puis la charge par Pod remonte, et le cycle recommence. En pratique : HPA sur le CPU et VPA sur la mémoire, ou VPA en mode recommandation seule."
+    }
+  ]
+},
+
+{
+  id: 13,
+  title: "Helm, Kustomize et Observabilité",
+  desc: "Packager et déployer des applications avec Helm et Kustomize, puis les superviser avec Prometheus et Grafana",
   objectives: [
     "Comprendre Helm : charts, repositories, values, releases",
     "Installer, mettre à jour et annuler des déploiements avec Helm",
     "Personnaliser des manifests YAML avec Kustomize (bases et overlays)",
-    "Découvrir le monitoring avec Prometheus et Grafana",
-    "Appliquer une méthodologie de troubleshooting structurée avec kubectl debug"
+    "Comprendre ce qu'est une métrique et comment Prometheus la collecte",
+    "Instrumenter un cluster avec Prometheus et Grafana"
   ],
   sections: [
     {
@@ -3308,7 +4406,7 @@ nom-du-pod.nom-du-service.namespace.svc.cluster.local</code></pre><button class=
 <div class="code-block"><pre><code><span class="hl-key">replicaCount</span>: <span class="hl-num">2</span>
 <span class="hl-key">image</span>:
   <span class="hl-key">repository</span>: <span class="hl-str">nginx</span>
-  <span class="hl-key">tag</span>: <span class="hl-str">"1.27"</span>
+  <span class="hl-key">tag</span>: <span class="hl-str">"1.30"</span>
   <span class="hl-key">pullPolicy</span>: <span class="hl-str">IfNotPresent</span>
 <span class="hl-key">service</span>:
   <span class="hl-key">type</span>: <span class="hl-str">ClusterIP</span>
@@ -3567,93 +4665,6 @@ nom-du-pod.nom-du-service.namespace.svc.cluster.local</code></pre><button class=
 <span class="hl-cmd">$ kubectl top pods <span class="hl-flag">-n</span> mon-namespace</span>
 <span class="hl-cmd">$ kubectl top pods <span class="hl-flag">--sort-by</span>=memory</span></code></pre><button class="copy-btn">Copier</button></div>
 <div class="info-box tip">Le Metrics Server est indispensable pour le <strong>Horizontal Pod Autoscaler</strong> (HPA) qui ajuste automatiquement le nombre de réplicas en fonction de la charge CPU ou mémoire. C'est aussi nécessaire pour que <code>kubectl top</code> fonctionne.</div>`
-    },
-    {
-      title: "Troubleshooting",
-      content: `<p>Le troubleshooting représente <strong>30% de l'examen CKA</strong>. Avoir une approche méthodique est essentiel. Voici une méthodologie structurée et les outils pour diagnostiquer les problèmes les plus courants.</p>
-<h3>Méthodologie en 5 étapes</h3>
-<div class="diagram">
-  <span class="d-accent">Méthode de troubleshooting</span>
-
-  1. État global     -->  kubectl get nodes / pods -A
-         |
-  2. Décrire         -->  kubectl describe pod/node/svc
-         |
-  3. Logs            -->  kubectl logs / logs --previous
-         |
-  4. Événements      -->  kubectl get events --sort-by=...
-         |
-  5. Debug interactif --> kubectl debug / exec
-</div>
-<div class="code-block"><pre><code><span class="hl-comment"># Étape 1 : Vue globale du cluster</span>
-<span class="hl-cmd">$ kubectl get nodes</span>
-<span class="hl-cmd">$ kubectl get pods <span class="hl-flag">-A</span> | grep -v Running</span>
-<span class="hl-cmd">$ kubectl get componentstatuses</span>
-
-<span class="hl-comment"># Étape 2 : Inspecter la ressource problématique</span>
-<span class="hl-cmd">$ kubectl describe pod &lt;nom&gt;</span>
-<span class="hl-cmd">$ kubectl describe node &lt;nom&gt;</span>
-<span class="hl-cmd">$ kubectl describe service &lt;nom&gt;</span>
-
-<span class="hl-comment"># Étape 3 : Lire les logs</span>
-<span class="hl-cmd">$ kubectl logs &lt;pod&gt;</span>
-<span class="hl-cmd">$ kubectl logs &lt;pod&gt; <span class="hl-flag">--previous</span></span>    <span class="hl-comment"># logs du conteneur précédent (après crash)</span>
-<span class="hl-cmd">$ kubectl logs &lt;pod&gt; <span class="hl-flag">-c</span> &lt;conteneur&gt;</span> <span class="hl-comment"># Pod multi-conteneur</span>
-<span class="hl-cmd">$ kubectl logs &lt;pod&gt; <span class="hl-flag">-f</span></span>            <span class="hl-comment"># suivre en temps réel</span>
-
-<span class="hl-comment"># Étape 4 : Événements du namespace</span>
-<span class="hl-cmd">$ kubectl get events <span class="hl-flag">--sort-by</span>=.metadata.creationTimestamp</span>
-
-<span class="hl-comment"># Étape 5 : Debug interactif</span>
-<span class="hl-cmd">$ kubectl debug &lt;pod&gt; <span class="hl-flag">-it</span> <span class="hl-flag">--image</span>=busybox <span class="hl-flag">--target</span>=&lt;conteneur&gt;</span>
-<span class="hl-cmd">$ kubectl exec <span class="hl-flag">-it</span> &lt;pod&gt; <span class="hl-flag">--</span> /bin/sh</span></code></pre><button class="copy-btn">Copier</button></div>
-<h3>kubectl debug en détail</h3>
-<p><code>kubectl debug</code> est un outil puissant pour diagnostiquer les problèmes. Il permet d'attacher un conteneur éphémère à un Pod existant, même si celui-ci n'a pas de shell :</p>
-<div class="code-block"><pre><code><span class="hl-comment"># Attacher un conteneur de debug à un Pod en cours d'exécution</span>
-<span class="hl-cmd">$ kubectl debug mon-pod <span class="hl-flag">-it</span> <span class="hl-flag">--image</span>=busybox <span class="hl-flag">--target</span>=mon-conteneur</span>
-
-<span class="hl-comment"># Créer une copie du Pod avec une image différente (utile si le Pod crashe)</span>
-<span class="hl-cmd">$ kubectl debug mon-pod <span class="hl-flag">-it</span> <span class="hl-flag">--copy-to</span>=mon-pod-debug <span class="hl-flag">--image</span>=busybox</span>
-
-<span class="hl-comment"># Déboguer un noeud directement</span>
-<span class="hl-cmd">$ kubectl debug node/mon-noeud <span class="hl-flag">-it</span> <span class="hl-flag">--image</span>=busybox</span></code></pre><button class="copy-btn">Copier</button></div>
-<h3>Problèmes courants et solutions</h3>
-<p><strong>CrashLoopBackOff</strong> : le conteneur démarre, crashe, est relancé, re-crashe en boucle.</p>
-<div class="code-block"><pre><code><span class="hl-comment"># Diagnostic</span>
-<span class="hl-cmd">$ kubectl describe pod &lt;nom&gt;</span>     <span class="hl-comment"># section Events</span>
-<span class="hl-cmd">$ kubectl logs &lt;nom&gt;</span>             <span class="hl-comment"># erreur dans l'application</span>
-<span class="hl-cmd">$ kubectl logs &lt;nom&gt; <span class="hl-flag">--previous</span></span>  <span class="hl-comment"># logs du crash précédent</span>
-
-<span class="hl-comment"># Causes courantes :</span>
-<span class="hl-comment"># - Commande ou entrypoint invalide</span>
-<span class="hl-comment"># - Variable d'environnement manquante</span>
-<span class="hl-comment"># - Port déjà utilisé</span>
-<span class="hl-comment"># - Fichier de configuration absent</span>
-<span class="hl-comment"># - Liveness probe trop agressive</span></code></pre><button class="copy-btn">Copier</button></div>
-<p><strong>ImagePullBackOff</strong> : Kubernetes n'arrive pas à télécharger l'image Docker.</p>
-<div class="code-block"><pre><code><span class="hl-comment"># Causes courantes :</span>
-<span class="hl-comment"># - Nom de l'image mal orthographié</span>
-<span class="hl-comment"># - Tag inexistant</span>
-<span class="hl-comment"># - Registry privée sans imagePullSecret</span>
-<span class="hl-comment"># - Pas de connexion Internet</span>
-
-<span class="hl-cmd">$ kubectl describe pod &lt;nom&gt;</span>  <span class="hl-comment"># cherche "Failed to pull image"</span></code></pre><button class="copy-btn">Copier</button></div>
-<p><strong>Pending</strong> : le Pod reste en attente, aucun noeud ne l'accepte.</p>
-<div class="code-block"><pre><code><span class="hl-comment"># Causes courantes :</span>
-<span class="hl-comment"># - Pas assez de ressources sur les noeuds (requests trop élevées)</span>
-<span class="hl-comment"># - nodeSelector ou tolerations manquants</span>
-<span class="hl-comment"># - PVC non lié (Pending aussi)</span>
-
-<span class="hl-cmd">$ kubectl describe pod &lt;nom&gt;</span>   <span class="hl-comment"># section Events : FailedScheduling</span></code></pre><button class="copy-btn">Copier</button></div>
-<p><strong>Node NotReady</strong> : un noeud du cluster ne répond plus.</p>
-<div class="code-block"><pre><code><span class="hl-comment"># Diagnostic</span>
-<span class="hl-cmd">$ kubectl describe node &lt;nom&gt;</span>   <span class="hl-comment"># section Conditions</span>
-<span class="hl-comment"># Vérifier sur le noeud :</span>
-<span class="hl-comment"># - kubelet tourne ? (systemctl status kubelet)</span>
-<span class="hl-comment"># - Disque plein ? (df -h)</span>
-<span class="hl-comment"># - Mémoire saturée ? (free -m)</span>
-<span class="hl-comment"># - Container runtime OK ? (systemctl status containerd)</span></code></pre><button class="copy-btn">Copier</button></div>
-<div class="info-box warning"><strong>Réflexe troubleshooting</strong> : toujours commencer par <code>kubectl describe</code> et lire la section <strong>Events</strong> en bas de la sortie. Dans 90% des cas, la réponse au problème s'y trouve.</div>`
     }
   ],
   exercises: [
@@ -3673,24 +4684,43 @@ nom-du-pod.nom-du-service.namespace.svc.cluster.local</code></pre><button class=
         "Désinstalle proprement : <code>helm uninstall mon-web</code>"
       ],
       validation: "Tu dois avoir installé, mis à jour (3 réplicas), puis annulé la mise à jour avec rollback (retour à 2 réplicas). La commande <code>helm history mon-web</code> doit montrer 3 révisions.",
-      hint: "Si tu obtiens une erreur lors de l'installation, vérifie que le dépôt est bien ajouté avec <code>helm repo list</code>. Si les Pods ne démarrent pas, utilise <code>kubectl describe pod</code> pour diagnostiquer."
+      hint: "Si tu obtiens une erreur lors de l'installation, vérifie que le dépôt est bien ajouté avec <code>helm repo list</code>. Si les Pods ne démarrent pas, utilise <code>kubectl describe pod</code> pour diagnostiquer.",
+      check: [
+        {
+          label: "La release Helm mon-web existe",
+          args: ["get", "secret", "-l", "owner=helm,name=mon-web", "-o", "json"],
+          rules: [
+            { path: "items.length", atLeast: 3, label: "Trois révisions sont enregistrées : install, upgrade puis rollback" }
+          ]
+        }
+      ]
     },
     {
-      title: "Diagnostiquer un déploiement cassé",
-      desc: "Déploie intentionnellement des Pods avec des erreurs variées et utilise la méthodologie de troubleshooting pour identifier et corriger chaque problème.",
+      title: "Personnaliser un déploiement avec Kustomize",
+      desc: "Construis une base commune et deux overlays (dev et prod) qui la modifient sans jamais la dupliquer.",
       steps: [
-        "Crée un Pod avec une image inexistante : <code>kubectl run bug-image --image=nginx:version-qui-nexiste-pas</code>",
-        "Observe le statut : <code>kubectl get pod bug-image</code> (tu dois voir ImagePullBackOff)",
-        "Diagnostique avec : <code>kubectl describe pod bug-image</code> et lis la section Events",
-        "Supprime le Pod : <code>kubectl delete pod bug-image</code>",
-        "Crée un Pod qui crashe en boucle : <code>kubectl run bug-crash --image=busybox -- /bin/sh -c 'echo Erreur fatale && exit 1'</code>",
-        "Observe le CrashLoopBackOff : <code>kubectl get pod bug-crash -w</code> (Ctrl+C pour arrêter)",
-        "Lis les logs du crash : <code>kubectl logs bug-crash --previous</code>",
-        "Utilise kubectl debug pour inspecter : <code>kubectl debug bug-crash -it --image=busybox --copy-to=bug-debug</code>",
-        "Nettoie tout : <code>kubectl delete pod bug-image bug-crash bug-debug</code>"
+        "Crée l'arborescence : <code>mkdir -p kustom/base kustom/overlays/dev kustom/overlays/prod</code>",
+        "Dans <code>kustom/base</code>, génère un manifest : <code>kubectl create deployment web --image=nginx:1.30 --replicas=1 --dry-run=client -o yaml > kustom/base/deployment.yaml</code>",
+        "Crée <code>kustom/base/kustomization.yaml</code> avec <code>resources:</code> listant <code>deployment.yaml</code>",
+        "Crée <code>kustom/overlays/dev/kustomization.yaml</code> avec <code>resources: [../../base]</code> et <code>namePrefix: dev-</code>",
+        "Crée <code>kustom/overlays/prod/kustomization.yaml</code> avec <code>resources: [../../base]</code>, <code>namePrefix: prod-</code> et un patch portant <code>replicas</code> à 3",
+        "Compare les deux rendus sans rien appliquer : <code>kubectl kustomize kustom/overlays/dev</code> puis <code>kubectl kustomize kustom/overlays/prod</code>",
+        "Applique l'overlay dev : <code>kubectl apply -k kustom/overlays/dev</code>",
+        "Vérifie : <code>kubectl get deployments</code> (tu dois voir <code>dev-web</code> avec 1 réplica)",
+        "Nettoie : <code>kubectl delete -k kustom/overlays/dev</code>"
       ],
-      validation: "Tu dois savoir identifier ImagePullBackOff (mauvaise image) et CrashLoopBackOff (conteneur qui crashe) en utilisant describe + logs. Tu dois aussi avoir utilisé kubectl debug pour inspecter un Pod.",
-      hint: "Le flag <code>--previous</code> permet de lire les logs d'un conteneur qui a crashé. Sans ce flag, tu obtiens les logs du conteneur actuel (qui peut être en cours de redémarrage et donc vide)."
+      validation: "<code>kubectl kustomize</code> produit deux manifests différents à partir de la même base : dev-web avec 1 réplica, prod-web avec 3. Le fichier de base n'a jamais été modifié.",
+      hint: "<code>kubectl kustomize</code> affiche le résultat sans rien envoyer au cluster : c'est l'équivalent d'un <code>helm template</code>. Prends le réflexe de toujours le lancer avant <code>kubectl apply -k</code>.",
+      check: [
+        {
+          label: "L'overlay dev est appliqué",
+          args: ["get", "deployment", "dev-web", "-o", "json"],
+          rules: [
+            { path: "metadata.name", equals: "dev-web", label: "Le namePrefix dev- a bien été appliqué" },
+            { path: "spec.replicas", equals: 1, label: "L'overlay dev déploie 1 réplica" }
+          ]
+        }
+      ]
     }
   ],
   commands: [
@@ -3707,8 +4737,8 @@ nom-du-pod.nom-du-service.namespace.svc.cluster.local</code></pre><button class=
       answers: ["helm upgrade mon-app bitnami/nginx --set replicaCount=5"]
     },
     {
-      prompt: "Quelle commande pour lancer un conteneur de debug busybox attaché à un Pod nommé 'api-server' ?",
-      answers: ["kubectl debug api-server -it --image=busybox", "kubectl debug api-server -it --image=busybox --target=api-server"]
+      prompt: "Quelle commande affiche le rendu d'un dossier Kustomize situé dans 'overlays/prod' sans l'appliquer ?",
+      answers: ["kubectl kustomize overlays/prod", "kubectl kustomize ./overlays/prod", "kustomize build overlays/prod"]
     }
   ],
   quiz: [
@@ -3757,23 +4787,411 @@ nom-du-pod.nom-du-service.namespace.svc.cluster.local</code></pre><button class=
       explanation: "Prometheus fonctionne en mode pull (scraping) : il interroge périodiquement les endpoints <code>/metrics</code> de tes applications pour collecter les métriques. C'est l'inverse du mode push utilisé par d'autres systèmes comme StatsD."
     },
     {
-      question: "Quel est le premier réflexe quand un Pod est en CrashLoopBackOff ?",
+      question: "Quelle commande permet de vérifier ce qu'un chart Helm va réellement créer, sans rien installer ?",
       options: [
-        "Supprimer et recréer le Pod immédiatement",
-        "Augmenter les limites de ressources CPU et mémoire",
-        "Lire les logs avec kubectl logs --previous et les events avec kubectl describe",
-        "Redémarrer le noeud sur lequel tourne le Pod"
+        "helm install mon-app ./chart --dry-run",
+        "helm template mon-app ./chart",
+        "helm lint ./chart",
+        "helm status mon-app"
       ],
-      correct: 2,
-      explanation: "Le premier réflexe est de diagnostiquer : <code>kubectl logs &lt;pod&gt; --previous</code> pour lire les logs du crash, et <code>kubectl describe pod &lt;pod&gt;</code> pour voir les events. La cause est souvent visible dans les logs (erreur de configuration, variable manquante, dépendance inaccessible, etc.)."
+      correct: 1,
+      explanation: "<code>helm template</code> rend les templates localement et écrit le YAML final sur la sortie standard, sans contacter le cluster. C'est le réflexe pour relire ce qui va partir. <code>--dry-run</code> fait quelque chose de proche mais interroge l'API server, et <code>helm lint</code> ne vérifie que la structure du chart."
     }
   ]
 },
 
 {
-  id: 12,
+  id: 14,
+  title: "Troubleshooting méthodique",
+  desc: "Diagnostiquer une panne dans le bon ordre, du Pod au cluster, avec les bons outils",
+  objectives: [
+    "Appliquer une méthode de diagnostic en couches plutôt qu'au hasard",
+    "Reconnaître instantanément les statuts de Pod et leur cause",
+    "Exploiter describe, events, logs --previous et kubectl debug",
+    "Dérouler la chaîne réseau quand une application est injoignable",
+    "Diagnostiquer un noeud et le control plane"
+  ],
+  sections: [
+    {
+      title: "La méthode",
+      content: `<p>Le troubleshooting représente <strong>30% de l'examen CKA</strong>, et c'est de loin ce qu'on fait le plus souvent en production. Le piège est de partir dans tous les sens : relancer le Pod, redémarrer le noeud, augmenter les ressources au hasard. Une panne se diagnostique en descendant les couches dans l'ordre.</p>
+<div class="diagram">
+  <span class="d-accent">"Mon application ne répond pas"</span>
+
+  1. Le Pod existe-t-il et tourne-t-il ?
+     kubectl get pods            ->  Pending, CrashLoop, ImagePull ?
+              |
+  2. L'application tourne-t-elle dans le conteneur ?
+     kubectl logs                ->  erreur applicative ?
+              |
+  3. Le Service pointe-t-il sur les bons Pods ?
+     kubectl get endpoints       ->  liste vide ?
+              |
+  4. Le DNS résout-il ?
+     nslookup depuis un Pod      ->  NXDOMAIN ?
+              |
+  5. Une NetworkPolicy bloque-t-elle ?
+     kubectl get netpol          ->  trafic filtré ?
+              |
+  6. L'Ingress route-t-il ?
+     kubectl describe ingress    ->  backend introuvable ?
+              |
+  7. Le noeud est-il sain ?
+     kubectl get nodes           ->  NotReady, pression disque ?
+</div>
+<p>Chaque étape se répond en une commande. Tant que la précédente n'est pas verte, inutile de passer à la suivante.</p>
+<h3>Les quatre commandes qui règlent 90% des cas</h3>
+<div class="code-block"><pre><code><span class="hl-comment"># 1. Qu'est-ce qui ne va pas dans le cluster ?</span>
+<span class="hl-cmd">$ kubectl get pods <span class="hl-flag">-A</span> | grep -v Running | grep -v Completed</span>
+
+<span class="hl-comment"># 2. Pourquoi cette ressource va mal ? (regarder la section Events en bas)</span>
+<span class="hl-cmd">$ kubectl describe pod &lt;nom&gt;</span>
+
+<span class="hl-comment"># 3. Que dit l'application ?</span>
+<span class="hl-cmd">$ kubectl logs &lt;nom&gt; <span class="hl-flag">--previous</span></span>
+
+<span class="hl-comment"># 4. Que s'est-il passé récemment dans le namespace ?</span>
+<span class="hl-cmd">$ kubectl get events <span class="hl-flag">--sort-by</span>=.lastTimestamp</span></code></pre><button class="copy-btn">Copier</button></div>
+<div class="info-box tip">Le réflexe numéro un est <code>kubectl describe</code>, et plus précisément la section <strong>Events</strong> en bas de sa sortie. Kubernetes y écrit littéralement pourquoi il n'arrive pas à faire ce que tu lui demandes. Beaucoup de gens lisent le YAML et passent à côté du message qui donne la réponse.</div>
+<div class="info-box warning">Par défaut, les events ne sont conservés qu'une heure. Sur un incident un peu ancien, ils auront disparu : il faudra se rabattre sur les logs de l'application et sur le monitoring.</div>`
+    },
+    {
+      title: "Lire le statut d'un Pod",
+      content: `<p>La colonne STATUS de <code>kubectl get pods</code> est un diagnostic à elle seule. Voici les statuts que tu rencontreras, et ce qu'ils signifient réellement.</p>
+<h3>Pending — le Pod n'est pas encore placé</h3>
+<p>Le scheduler n'a trouvé aucun noeud acceptable, ou un volume manque.</p>
+<div class="code-block"><pre><code><span class="hl-cmd">$ kubectl describe pod &lt;nom&gt; | grep <span class="hl-flag">-A</span> 10 Events</span>
+
+<span class="hl-comment"># "Insufficient cpu" / "Insufficient memory"</span>
+<span class="hl-comment">#   -> requests trop élevées, ou cluster saturé</span>
+<span class="hl-comment"># "didn't match Pod's node affinity/selector"</span>
+<span class="hl-comment">#   -> label manquant sur les noeuds (module 11)</span>
+<span class="hl-comment"># "had untolerated taint"</span>
+<span class="hl-comment">#   -> toleration manquante (module 11)</span>
+<span class="hl-comment"># "pod has unbound immediate PersistentVolumeClaims"</span>
+<span class="hl-comment">#   -> le PVC n'est pas Bound (module 7)</span></code></pre><button class="copy-btn">Copier</button></div>
+<h3>ImagePullBackOff / ErrImagePull — l'image ne se télécharge pas</h3>
+<div class="code-block"><pre><code><span class="hl-comment"># Causes, par ordre de fréquence :</span>
+<span class="hl-comment">#   1. faute de frappe dans le nom ou le tag</span>
+<span class="hl-comment">#   2. tag qui n'existe pas (souvent un "latest" supprimé)</span>
+<span class="hl-comment">#   3. registry privée sans imagePullSecret</span>
+<span class="hl-comment">#   4. quota de téléchargement du registry atteint</span>
+
+<span class="hl-cmd">$ kubectl describe pod &lt;nom&gt; | grep <span class="hl-flag">-i</span> "failed to pull"</span></code></pre><button class="copy-btn">Copier</button></div>
+<h3>CrashLoopBackOff — le conteneur démarre puis meurt, en boucle</h3>
+<p>Le statut le plus courant, et le plus mal compris : ce n'est pas une erreur en soi, c'est Kubernetes qui te dit « je relance, mais ça remeurt à chaque fois ». La cause est dans l'application.</p>
+<div class="code-block"><pre><code><span class="hl-comment"># LA commande à connaître : les logs de l'instance précédente</span>
+<span class="hl-cmd">$ kubectl logs &lt;nom&gt; <span class="hl-flag">--previous</span></span>
+
+<span class="hl-comment"># Causes courantes :</span>
+<span class="hl-comment">#   - variable d'environnement ou fichier de config manquant</span>
+<span class="hl-comment">#   - dépendance injoignable au démarrage (base de données)</span>
+<span class="hl-comment">#   - commande ou entrypoint invalide</span>
+<span class="hl-comment">#   - livenessProbe trop agressive : l'app est tuée avant d'être prête</span>
+<span class="hl-comment">#   - le processus principal se termine (un conteneur doit rester au premier plan)</span></code></pre><button class="copy-btn">Copier</button></div>
+<div class="info-box warning">Sans <code>--previous</code>, tu lis les logs du conteneur <em>actuel</em>, qui vient à peine de redémarrer et n'a donc rien écrit. C'est la raison pour laquelle beaucoup de gens concluent à tort « il n'y a pas de logs ».</div>
+<h3>OOMKilled — le conteneur a dépassé sa limite mémoire</h3>
+<div class="code-block"><pre><code><span class="hl-cmd">$ kubectl describe pod &lt;nom&gt; | grep <span class="hl-flag">-A</span> 3 "Last State"</span>
+Last State:     Terminated
+  Reason:       OOMKilled
+  Exit Code:    137</code></pre><button class="copy-btn">Copier</button></div>
+<p>Le noyau a tué le processus parce qu'il dépassait <code>limits.memory</code>. Soit la limite est trop basse, soit l'application fuit. Le code de sortie <strong>137</strong> (128 + signal 9) est la signature à reconnaître.</p>
+<h3>Init:0/1 et Init:Error — un initContainer bloque</h3>
+<div class="code-block"><pre><code><span class="hl-comment"># Les logs d'un initContainer se demandent explicitement</span>
+<span class="hl-cmd">$ kubectl logs &lt;pod&gt; <span class="hl-flag">-c</span> &lt;nom-init-container&gt;</span></code></pre><button class="copy-btn">Copier</button></div>
+<h3>Running mais 0/1 READY — l'application tourne, la readinessProbe échoue</h3>
+<p>Cas sournois : le Pod est vert dans STATUS, mais aucun trafic ne lui arrive car le Service l'exclut de ses endpoints.</p>
+<div class="code-block"><pre><code><span class="hl-cmd">$ kubectl describe pod &lt;nom&gt; | grep <span class="hl-flag">-i</span> readiness</span>
+Warning  Unhealthy  Readiness probe failed: HTTP probe failed with statuscode: 404</code></pre><button class="copy-btn">Copier</button></div>
+<div class="diagram">
+  <span class="d-accent">READY</span> 0/1 + <span class="d-accent">STATUS</span> Running  ->  regarde la readinessProbe
+  <span class="d-accent">RESTARTS</span> qui grimpe          ->  regarde la livenessProbe et les logs --previous
+  <span class="d-accent">STATUS</span> Completed           ->  normal pour un Job, anormal pour un Deployment
+</div>`
+    },
+    {
+      title: "kubectl debug et conteneurs éphémères",
+      content: `<p>Les images modernes sont minimalistes : ni shell, ni <code>curl</code>, ni <code>ping</code>. Un <code>kubectl exec</code> répond alors <code>exec: "/bin/sh": executable file not found</code>. Et sur un Pod en CrashLoopBackOff, il n'y a de toute façon pas de conteneur vivant où entrer.</p>
+<p><code>kubectl debug</code> résout les deux cas. Il attache un <strong>conteneur éphémère</strong> — un conteneur temporaire, avec les outils que tu veux, dans le même Pod et donc le même réseau.</p>
+<div class="code-block"><pre><code><span class="hl-comment"># Attacher un shell à un Pod qui tourne, en partageant ses processus</span>
+<span class="hl-cmd">$ kubectl debug &lt;pod&gt; <span class="hl-flag">-it</span> <span class="hl-flag">--image</span>=busybox:1.37 <span class="hl-flag">--target</span>=&lt;conteneur&gt;</span>
+
+<span class="hl-comment"># Copier un Pod qui crashe, en remplaçant sa commande par un shell</span>
+<span class="hl-cmd">$ kubectl debug &lt;pod&gt; <span class="hl-flag">-it</span> <span class="hl-flag">--copy-to</span>=debug-pod <span class="hl-flag">--image</span>=busybox:1.37 <span class="hl-flag">--</span> sh</span>
+
+<span class="hl-comment"># Obtenir un shell sur le système de fichiers d'un noeud</span>
+<span class="hl-cmd">$ kubectl debug node/&lt;noeud&gt; <span class="hl-flag">-it</span> <span class="hl-flag">--image</span>=busybox:1.37</span></code></pre><button class="copy-btn">Copier</button></div>
+<p><code>--target</code> partage l'espace de processus du conteneur visé : depuis le conteneur de debug, tu vois ses processus et son <code>/proc</code>. Sans ce flag, tu ne partages que le réseau et les volumes.</p>
+<div class="info-box tip">La deuxième forme, <code>--copy-to</code>, est celle qui sauve la mise sur un CrashLoopBackOff : elle crée une copie du Pod dont la commande de démarrage est remplacée par un shell. Le conteneur ne crashe plus, tu peux inspecter tranquillement la configuration montée, les variables d'environnement et les fichiers.</div>
+<h3>Un Pod jetable pour tester le réseau</h3>
+<div class="code-block"><pre><code><span class="hl-comment"># Un shell temporaire, supprimé à la sortie</span>
+<span class="hl-cmd">$ kubectl run debug <span class="hl-flag">--rm</span> <span class="hl-flag">-it</span> <span class="hl-flag">--image</span>=busybox:1.37 <span class="hl-flag">--</span> sh</span>
+
+<span class="hl-comment"># Version avec des outils réseau complets (dig, curl, tcpdump, netstat)</span>
+<span class="hl-cmd">$ kubectl run debug <span class="hl-flag">--rm</span> <span class="hl-flag">-it</span> <span class="hl-flag">--image</span>=nicolaka/netshoot <span class="hl-flag">--</span> bash</span></code></pre><button class="copy-btn">Copier</button></div>
+<h3>Les autres commandes utiles</h3>
+<div class="code-block"><pre><code><span class="hl-comment"># Vérifier ce que le cluster a réellement enregistré</span>
+<span class="hl-cmd">$ kubectl get pod &lt;nom&gt; <span class="hl-flag">-o</span> yaml</span>
+
+<span class="hl-comment"># Extraire un champ précis sans lire tout le YAML</span>
+<span class="hl-cmd">$ kubectl get pod &lt;nom&gt; <span class="hl-flag">-o</span> jsonpath=<span class="hl-str">'{.status.containerStatuses[0].state}'</span></span>
+
+<span class="hl-comment"># Vérifier un droit RBAC (module 10)</span>
+<span class="hl-cmd">$ kubectl auth can-i create pods <span class="hl-flag">--as</span>=system:serviceaccount:dev:mon-sa</span>
+
+<span class="hl-comment"># Tester un manifest sans rien créer</span>
+<span class="hl-cmd">$ kubectl apply <span class="hl-flag">-f</span> app.yaml <span class="hl-flag">--dry-run</span>=server</span>
+
+<span class="hl-comment"># Retrouver la syntaxe d'un champ, hors ligne</span>
+<span class="hl-cmd">$ kubectl explain deployment.spec.strategy <span class="hl-flag">--recursive</span></span></code></pre><button class="copy-btn">Copier</button></div>
+<div class="info-box tip"><code>--dry-run=server</code> envoie le manifest à l'API server, qui le valide entièrement (schéma, admission controllers, quotas) puis le jette. C'est la meilleure façon de vérifier un YAML avant de l'appliquer pour de bon.</div>`
+    },
+    {
+      title: "Dérouler la chaîne réseau",
+      content: `<p>« Le Pod tourne mais l'application est injoignable » est la seconde grande famille de pannes. Elle se diagnostique toujours dans le même ordre : endpoints, DNS, policies, ingress.</p>
+<h3>1. Le Service a-t-il des endpoints ?</h3>
+<div class="code-block"><pre><code><span class="hl-cmd">$ kubectl get endpoints mon-service</span>
+NAME          ENDPOINTS   AGE
+mon-service   &lt;none&gt;      5m</code></pre><button class="copy-btn">Copier</button></div>
+<p>Une liste vide est le symptôme le plus fréquent, avec exactement trois causes possibles :</p>
+<ul>
+<li>Le <code>selector</code> du Service ne correspond à aucun label de Pod — souvent une faute de frappe, ou <code>app: api</code> côté Service contre <code>app: API</code> côté Pod.</li>
+<li>Les Pods existent mais ne sont pas <strong>Ready</strong> : un Pod dont la readinessProbe échoue est retiré des endpoints.</li>
+<li>Le <code>targetPort</code> ne correspond à aucun port exposé par le conteneur.</li>
+</ul>
+<div class="code-block"><pre><code><span class="hl-comment"># Comparer le selector du Service...</span>
+<span class="hl-cmd">$ kubectl get service mon-service <span class="hl-flag">-o</span> jsonpath=<span class="hl-str">'{.spec.selector}'</span></span>
+
+<span class="hl-comment"># ...avec les labels réellement portés par les Pods</span>
+<span class="hl-cmd">$ kubectl get pods <span class="hl-flag">--show-labels</span></span></code></pre><button class="copy-btn">Copier</button></div>
+<h3>2. Le DNS résout-il ?</h3>
+<div class="code-block"><pre><code><span class="hl-cmd">$ kubectl run dns-test <span class="hl-flag">--rm</span> <span class="hl-flag">-it</span> <span class="hl-flag">--image</span>=busybox:1.37 <span class="hl-flag">--</span> sh</span>
+
+<span class="hl-comment"># Depuis le shell obtenu :</span>
+nslookup mon-service
+nslookup mon-service.mon-namespace.svc.cluster.local
+wget -qO- --timeout=3 http://mon-service</code></pre><button class="copy-btn">Copier</button></div>
+<p>Si le nom court échoue mais que le nom complet fonctionne, le problème vient du <code>search domain</code> : tu appelles probablement un Service d'un autre namespace. Si les deux échouent, regarde CoreDNS :</p>
+<div class="code-block"><pre><code><span class="hl-cmd">$ kubectl get pods <span class="hl-flag">-n</span> kube-system <span class="hl-flag">-l</span> k8s-app=kube-dns</span>
+<span class="hl-cmd">$ kubectl logs <span class="hl-flag">-n</span> kube-system <span class="hl-flag">-l</span> k8s-app=kube-dns</span></code></pre><button class="copy-btn">Copier</button></div>
+<h3>3. Une NetworkPolicy bloque-t-elle ?</h3>
+<div class="code-block"><pre><code><span class="hl-cmd">$ kubectl get networkpolicies <span class="hl-flag">-A</span></span>
+<span class="hl-cmd">$ kubectl describe networkpolicy &lt;nom&gt; <span class="hl-flag">-n</span> &lt;namespace&gt;</span></code></pre><button class="copy-btn">Copier</button></div>
+<p>Rappel du module 10 : dès qu'une policy sélectionne un Pod, tout ce qui n'est pas explicitement autorisé est refusé. Le symptôme typique est un <strong>timeout</strong> (et non un « connection refused ») : le paquet est jeté silencieusement.</p>
+<h3>4. L'Ingress route-t-il ?</h3>
+<div class="code-block"><pre><code><span class="hl-cmd">$ kubectl describe ingress mon-ingress</span>
+
+<span class="hl-comment"># Points à vérifier dans la sortie :</span>
+<span class="hl-comment">#   - Address est-il renseigné ? (sinon le controller ne l'a pas pris en charge)</span>
+<span class="hl-comment">#   - le backend affiche-t-il des endpoints, ou "&lt;error: endpoints not found&gt;" ?</span>
+<span class="hl-comment">#   - ingressClassName correspond-il à une IngressClass existante ?</span>
+
+<span class="hl-cmd">$ kubectl logs <span class="hl-flag">-n</span> ingress-nginx <span class="hl-flag">-l</span> app.kubernetes.io/component=controller</span></code></pre><button class="copy-btn">Copier</button></div>
+<div class="info-box tip">Pour isoler la couche fautive, court-circuite tout avec un port-forward direct sur le Pod : <code>kubectl port-forward pod/&lt;nom&gt; 8080:80</code>. Si ça répond, ton application va bien et le problème est dans le Service, le DNS ou l'Ingress. Si ça ne répond pas, le problème est dans l'application elle-même.</div>`
+    },
+    {
+      title: "Noeuds et control plane",
+      content: `<p>Quand plusieurs Pods sans rapport tombent en même temps, arrête de regarder les Pods : regarde l'infrastructure.</p>
+<div class="code-block"><pre><code><span class="hl-cmd">$ kubectl get nodes</span>
+NAME       STATUS     ROLES           AGE   VERSION
+worker-2   NotReady   &lt;none&gt;          40d   v1.36.0
+
+<span class="hl-cmd">$ kubectl describe node worker-2</span></code></pre><button class="copy-btn">Copier</button></div>
+<p>La section <strong>Conditions</strong> de <code>describe node</code> donne le diagnostic directement :</p>
+<div class="diagram">
+  <span class="d-accent">Ready</span>            False  ->  le kubelet ne répond plus
+  <span class="d-accent">MemoryPressure</span>   True   ->  mémoire épuisée, éviction de Pods en cours
+  <span class="d-accent">DiskPressure</span>     True   ->  disque plein (souvent : images non nettoyées)
+  <span class="d-accent">PIDPressure</span>      True   ->  trop de processus sur le noeud
+</div>
+<p>Un noeud <code>NotReady</code> vient presque toujours du kubelet ou du runtime de conteneurs. Le diagnostic se fait alors sur la machine elle-même :</p>
+<div class="code-block"><pre><code><span class="hl-comment"># En SSH sur le noeud</span>
+<span class="hl-cmd">$ systemctl status kubelet</span>
+<span class="hl-cmd">$ journalctl <span class="hl-flag">-u</span> kubelet <span class="hl-flag">-n</span> 100 <span class="hl-flag">--no-pager</span></span>
+<span class="hl-cmd">$ df <span class="hl-flag">-h</span> /var/lib</span>
+
+<span class="hl-comment"># Ou sans SSH, avec un conteneur de debug</span>
+<span class="hl-cmd">$ kubectl debug node/worker-2 <span class="hl-flag">-it</span> <span class="hl-flag">--image</span>=busybox:1.37</span></code></pre><button class="copy-btn">Copier</button></div>
+<h3>Sortir un noeud du service proprement</h3>
+<div class="code-block"><pre><code><span class="hl-comment"># 1. Empêcher tout nouveau Pod d'y arriver</span>
+<span class="hl-cmd">$ kubectl cordon worker-2</span>
+
+<span class="hl-comment"># 2. Déplacer les Pods existants (respecte les PodDisruptionBudgets)</span>
+<span class="hl-cmd">$ kubectl drain worker-2 <span class="hl-flag">--ignore-daemonsets</span> <span class="hl-flag">--delete-emptydir-data</span></span>
+
+<span class="hl-comment"># 3. Après intervention, remettre le noeud en service</span>
+<span class="hl-cmd">$ kubectl uncordon worker-2</span></code></pre><button class="copy-btn">Copier</button></div>
+<div class="info-box note"><code>--ignore-daemonsets</code> est nécessaire car les Pods de DaemonSet seraient immédiatement recréés sur place : les évincer n'aurait aucun sens. <code>--delete-emptydir-data</code> confirme que tu acceptes de perdre les données des volumes <code>emptyDir</code>, qui sont par nature éphémères.</div>
+<h3>Le control plane</h3>
+<div class="code-block"><pre><code><span class="hl-comment"># L'API server répond-il ?</span>
+<span class="hl-cmd">$ kubectl get <span class="hl-flag">--raw</span>=<span class="hl-str">'/readyz?verbose'</span></span>
+
+<span class="hl-comment"># État des composants (sur un cluster kubeadm, ils tournent en Pods statiques)</span>
+<span class="hl-cmd">$ kubectl get pods <span class="hl-flag">-n</span> kube-system</span>
+
+<span class="hl-comment"># Si l'API server lui-même est down, kubectl ne sert plus à rien :</span>
+<span class="hl-comment"># passer en SSH sur le control plane et regarder le runtime directement</span>
+<span class="hl-cmd">$ sudo crictl ps <span class="hl-flag">-a</span></span>
+<span class="hl-cmd">$ sudo crictl logs &lt;container-id&gt;</span></code></pre><button class="copy-btn">Copier</button></div>
+<div class="info-box warning">Sur un cluster kubeadm, les manifests du control plane sont dans <code>/etc/kubernetes/manifests/</code>. Une erreur de syntaxe dans l'un de ces fichiers rend l'API server injoignable, et donc <code>kubectl</code> inutilisable. Le seul recours passe alors par <code>crictl</code> et <code>journalctl -u kubelet</code> sur la machine.</div>`
+    }
+  ],
+  exercises: [
+    {
+      title: "Diagnostiquer quatre Pods cassés",
+      desc: "Casse volontairement des Pods de quatre façons différentes et identifie chaque cause avec la méthode, sans regarder la solution.",
+      steps: [
+        "Image inexistante : <code>kubectl run bug1 --image=nginx:cette-version-nexiste-pas</code>",
+        "Crash au démarrage : <code>kubectl run bug2 --image=busybox:1.37 -- /bin/sh -c 'echo config manquante; exit 1'</code>",
+        "Ressources impossibles : <code>kubectl run bug3 --image=nginx:1.30 --overrides='{\"spec\":{\"containers\":[{\"name\":\"bug3\",\"image\":\"nginx:1.30\",\"resources\":{\"requests\":{\"cpu\":\"100\"}}}]}}'</code>",
+        "Limite mémoire trop basse : <code>kubectl run bug4 --image=python:3.13-slim --overrides='{\"spec\":{\"containers\":[{\"name\":\"bug4\",\"image\":\"python:3.13-slim\",\"command\":[\"python\",\"-c\",\"a=bytearray(500*1024*1024)\"],\"resources\":{\"limits\":{\"memory\":\"32Mi\"}}}]}}'</code>",
+        "Fais le point : <code>kubectl get pods</code> et note le STATUS de chacun",
+        "Pour bug1, trouve le message exact : <code>kubectl describe pod bug1 | grep -A 10 Events</code>",
+        "Pour bug2, lis les logs du crash : <code>kubectl logs bug2 --previous</code>",
+        "Pour bug3, trouve pourquoi il reste Pending : <code>kubectl describe pod bug3 | grep -A 5 Events</code>",
+        "Pour bug4, identifie l'OOMKill : <code>kubectl describe pod bug4 | grep -A 5 'Last State'</code>",
+        "Nettoie : <code>kubectl delete pod bug1 bug2 bug3 bug4</code>"
+      ],
+      validation: "Tu dois pouvoir associer chaque Pod à son statut et à sa cause : bug1 ImagePullBackOff (tag inexistant), bug2 CrashLoopBackOff (l'application sort en erreur), bug3 Pending (Insufficient cpu), bug4 OOMKilled avec le code de sortie 137.",
+      hint: "Pour bug3, 100 CPU signifie 100 coeurs : aucun noeud ne peut le satisfaire. Pour bug4, l'information n'est pas dans les logs mais dans <code>Last State: Terminated, Reason: OOMKilled</code> de la sortie de describe.",
+      check: [
+        {
+          label: "Le Pod bug1 existe",
+          args: ["get", "pod", "bug1", "-o", "json"],
+          rules: [
+            { path: "status.containerStatuses.*.state.waiting.reason", contains: "ImagePull", label: "bug1 est bloqué sur le téléchargement de l'image" }
+          ]
+        },
+        {
+          label: "Le Pod bug3 existe",
+          args: ["get", "pod", "bug3", "-o", "json"],
+          rules: [
+            { path: "status.phase", equals: "Pending", label: "bug3 reste Pending faute de ressources disponibles" }
+          ]
+        }
+      ]
+    },
+    {
+      title: "Réparer un Service qui ne route rien",
+      desc: "Reproduis la panne réseau la plus fréquente — un Service dont le selector ne correspond à aucun Pod — et répare-la.",
+      steps: [
+        "Déploie une application : <code>kubectl create deployment web --image=nginx:1.30 --replicas=2</code>",
+        "Crée un Service avec un selector volontairement faux : <code>kubectl create service clusterip web-svc --tcp=80:80</code>",
+        "Constate le problème : <code>kubectl get endpoints web-svc</code> (la colonne ENDPOINTS affiche &lt;none&gt;)",
+        "Compare le selector du Service : <code>kubectl get svc web-svc -o jsonpath='{.spec.selector}'</code>",
+        "Avec les labels réels des Pods : <code>kubectl get pods --show-labels</code>",
+        "Corrige le selector : <code>kubectl patch service web-svc -p '{\"spec\":{\"selector\":{\"app\":\"web\"}}}'</code>",
+        "Vérifie que les endpoints apparaissent : <code>kubectl get endpoints web-svc</code>",
+        "Teste depuis un Pod : <code>kubectl run test --rm -it --image=busybox:1.37 -- wget -qO- --timeout=3 web-svc</code>",
+        "Nettoie : <code>kubectl delete deployment web && kubectl delete service web-svc</code>"
+      ],
+      validation: "Avant correction, <code>kubectl get endpoints web-svc</code> affiche &lt;none&gt;. Après le patch du selector, les IPs des deux Pods apparaissent et la requête wget renvoie la page nginx.",
+      hint: "<code>kubectl create service clusterip</code> pose un selector <code>app: web-svc</code> — le nom du Service, pas celui du Deployment. C'est exactement l'écart d'une lettre qui casse un Service en production. La commande <code>kubectl expose deployment web --port=80</code> aurait posé le bon selector automatiquement.",
+      check: [
+        {
+          label: "Le Service web-svc est corrigé",
+          args: ["get", "svc", "web-svc", "-o", "json"],
+          rules: [
+            { path: "spec.selector.app", equals: "web", label: "Le selector cible enfin les Pods app=web" }
+          ]
+        },
+        {
+          label: "Les Endpoints sont peuplés",
+          args: ["get", "endpoints", "web-svc", "-o", "json"],
+          rules: [
+            { path: "subsets.*.addresses.length", atLeast: 2, label: "Les deux Pods sont désormais routés" }
+          ]
+        }
+      ]
+    }
+  ],
+  commands: [
+    {
+      prompt: "Quelle commande affiche les logs de l'instance précédente d'un Pod nommé 'api' qui redémarre en boucle ?",
+      answers: ["kubectl logs api --previous", "kubectl logs api -p", "kubectl logs --previous api", "kubectl logs -p api"]
+    },
+    {
+      prompt: "Quelle commande liste les événements du namespace courant triés par date ?",
+      answers: [
+        "kubectl get events --sort-by=.lastTimestamp",
+        "kubectl get events --sort-by=.metadata.creationTimestamp",
+        "kubectl get event --sort-by=.lastTimestamp",
+        "kubectl get event --sort-by=.metadata.creationTimestamp"
+      ]
+    },
+    {
+      prompt: "Quelle commande affiche les adresses IP des Pods derrière le Service 'web-svc' ?",
+      answers: ["kubectl get endpoints web-svc", "kubectl get ep web-svc", "kubectl describe service web-svc", "kubectl describe svc web-svc"]
+    },
+    {
+      prompt: "Quelle commande déplace tous les Pods d'un noeud 'worker-2' avant maintenance, en ignorant les DaemonSets ?",
+      answers: ["kubectl drain worker-2 --ignore-daemonsets", "kubectl drain node/worker-2 --ignore-daemonsets"]
+    }
+  ],
+  quiz: [
+    {
+      question: "Un Pod est en CrashLoopBackOff. Quel est le premier réflexe ?",
+      options: [
+        "Le supprimer et le recréer immédiatement",
+        "Augmenter ses limites de CPU et de mémoire",
+        "Lire kubectl logs --previous et la section Events de kubectl describe",
+        "Redémarrer le noeud sur lequel il tourne"
+      ],
+      correct: 2,
+      explanation: "Le conteneur actuel vient de redémarrer et n'a rien écrit : c'est <code>--previous</code> qui donne les logs de l'instance qui a crashé, donc l'erreur réelle. La section Events de <code>describe</code> complète en montrant ce que Kubernetes a tenté. Supprimer le Pod ne fait que perdre ces traces sans rien corriger."
+    },
+    {
+      question: "kubectl get endpoints renvoie une liste vide pour un Service. Quelle cause n'est PAS possible ?",
+      options: [
+        "Le selector du Service ne correspond à aucun label de Pod",
+        "Les Pods existent mais leur readinessProbe échoue",
+        "Le type du Service est ClusterIP au lieu de NodePort",
+        "Le targetPort ne correspond à aucun port du conteneur"
+      ],
+      correct: 2,
+      explanation: "Le type du Service (ClusterIP, NodePort, LoadBalancer) détermine comment on y accède, pas quels Pods il sélectionne : un ClusterIP a des endpoints comme les autres. Les trois autres réponses sont les causes réelles d'une liste d'endpoints vide, par ordre de fréquence."
+    },
+    {
+      question: "Un conteneur se termine avec le code 137 et la raison OOMKilled. Que s'est-il passé ?",
+      options: [
+        "L'application a levé une exception non gérée",
+        "Le conteneur a dépassé sa limits.memory et a été tué par le noyau",
+        "La livenessProbe a échoué trois fois de suite",
+        "Le noeud a été drainé pour maintenance"
+      ],
+      correct: 1,
+      explanation: "Le code 137 vaut 128 + 9, soit une terminaison par SIGKILL. Associé à <code>Reason: OOMKilled</code>, il signifie que le conteneur a dépassé sa <code>limits.memory</code>. Deux options : augmenter la limite si elle était sous-évaluée, ou corriger une fuite mémoire dans l'application."
+    },
+    {
+      question: "Pourquoi utiliser kubectl debug --copy-to plutôt que kubectl exec sur un Pod en CrashLoopBackOff ?",
+      options: [
+        "kubectl exec est obsolète depuis Kubernetes 1.30",
+        "Parce qu'aucun conteneur n'est vivant assez longtemps pour y entrer avec exec",
+        "Parce que exec ne fonctionne pas sur les Pods multi-conteneurs",
+        "Parce que copy-to est plus rapide à taper"
+      ],
+      correct: 1,
+      explanation: "<code>kubectl exec</code> a besoin d'un conteneur en cours d'exécution. Sur un CrashLoopBackOff, le conteneur meurt en quelques secondes. <code>kubectl debug --copy-to</code> crée une copie du Pod dont la commande de démarrage est remplacée par un shell : le conteneur ne crashe plus et tu peux inspecter la configuration montée et les variables d'environnement."
+    },
+    {
+      question: "Plusieurs Pods sans rapport entre eux passent en Pending sur un cluster. Où regarder en premier ?",
+      options: [
+        "Les logs de chaque application concernée",
+        "L'état des noeuds avec kubectl get nodes et kubectl describe node",
+        "Les NetworkPolicies du namespace",
+        "La configuration DNS de CoreDNS"
+      ],
+      correct: 1,
+      explanation: "Des symptômes simultanés sur des applications sans lien entre elles pointent vers une couche partagée, pas vers les applications. Un statut Pending signifie que le scheduler ne place plus rien : noeud NotReady, DiskPressure ou MemoryPressure. La section Conditions de <code>kubectl describe node</code> donne la réponse directement."
+    }
+  ]
+},
+
+
+{
+  id: 15,
   title: "Projet final : déploiement complet",
-  desc: "Construire et déployer une application complète sur minikube en appliquant tous les concepts des modules 1 à 11",
+  desc: "Construire et déployer une application complète sur minikube en appliquant tous les concepts des modules 1 à 14",
   objectives: [
     "Concevoir l'architecture d'une application multi-composants sur Kubernetes",
     "Déployer un backend (API Node.js) avec ConfigMap, Secret et probes de santé",
@@ -3806,7 +5224,7 @@ nom-du-pod.nom-du-service.namespace.svc.cluster.local</code></pre><button class=
           +---------------+    +---------------+
           | <span class="d-accent">Frontend</span>      |    | <span class="d-accent">Backend API</span>   |
           | Deployment    |    | Deployment    |
-          | nginx:1.27    |    | httpbin       |
+          | nginx:1.30    |    | httpbin       |
           | 2 réplicas    |    | 2 réplicas    |
           | Service: 80   |    | Service: 80   |
           +---------------+    +-------+-------+
@@ -3817,7 +5235,7 @@ nom-du-pod.nom-du-service.namespace.svc.cluster.local</code></pre><button class=
                                +---------------+
                                | <span class="d-accent">Redis</span>         |
                                | Deployment    |
-                               | redis:7       |
+                               | redis:8       |
                                | 1 réplica     |
                                | PVC: 1Gi      |
                                | Service: 6379 |
@@ -3990,7 +5408,7 @@ nom-du-pod.nom-du-service.namespace.svc.cluster.local</code></pre><button class=
     <span class="hl-key">spec</span>:
       <span class="hl-key">containers</span>:
       - <span class="hl-key">name</span>: <span class="hl-str">nginx</span>
-        <span class="hl-key">image</span>: <span class="hl-str">nginx:1.27</span>
+        <span class="hl-key">image</span>: <span class="hl-str">nginx:1.30</span>
         <span class="hl-key">ports</span>:
         - <span class="hl-key">containerPort</span>: <span class="hl-num">80</span>
           <span class="hl-key">name</span>: <span class="hl-str">http</span>
@@ -4086,7 +5504,7 @@ nom-du-pod.nom-du-service.namespace.svc.cluster.local</code></pre><button class=
     <span class="hl-key">spec</span>:
       <span class="hl-key">containers</span>:
       - <span class="hl-key">name</span>: <span class="hl-str">redis</span>
-        <span class="hl-key">image</span>: <span class="hl-str">redis:7</span>
+        <span class="hl-key">image</span>: <span class="hl-str">redis:8</span>
         <span class="hl-key">command</span>: [<span class="hl-str">"redis-server"</span>, <span class="hl-str">"--requirepass"</span>, <span class="hl-str">"$(REDIS_PASSWORD)"</span>, <span class="hl-str">"--appendonly"</span>, <span class="hl-str">"yes"</span>]
         <span class="hl-key">env</span>:
         - <span class="hl-key">name</span>: <span class="hl-str">REDIS_PASSWORD</span>
@@ -4319,7 +5737,30 @@ nom-du-pod.nom-du-service.namespace.svc.cluster.local</code></pre><button class=
         "Attends que le nouveau Pod soit Ready et vérifie que la donnée persiste : <code>kubectl exec -it deploy/redis -n projet-final -- redis-cli -a S3cur3P4ssw0rd! GET cle</code>"
       ],
       validation: "Le PVC doit être Bound, Redis doit répondre PONG au ping, et la donnée écrite doit survivre à la suppression du Pod grâce au volume persistant.",
-      hint: "Si le PVC reste en Pending, vérifie que le StorageClass par défaut existe avec <code>kubectl get storageclass</code>. Sur minikube, le StorageClass 'standard' est disponible par défaut."
+      hint: "Si le PVC reste en Pending, vérifie que le StorageClass par défaut existe avec <code>kubectl get storageclass</code>. Sur minikube, le StorageClass 'standard' est disponible par défaut.",
+      check: [
+        {
+          label: "Le Secret redis-secret existe",
+          args: ["get", "secret", "redis-secret", "-n", "projet-final", "-o", "json"],
+          rules: [
+            { path: "data.REDIS_PASSWORD", label: "Le mot de passe Redis est stocké dans un Secret" }
+          ]
+        },
+        {
+          label: "Le PVC de Redis est lié",
+          args: ["get", "pvc", "-n", "projet-final", "-o", "json"],
+          rules: [
+            { path: "items.*.status.phase", equals: "Bound", label: "Le PVC est Bound" }
+          ]
+        },
+        {
+          label: "Le Deployment redis existe",
+          args: ["get", "deployment", "redis", "-n", "projet-final", "-o", "json"],
+          rules: [
+            { path: "status.readyReplicas", atLeast: 1, label: "Redis est prêt" }
+          ]
+        }
+      ]
     },
     {
       title: "Déployer le backend et le frontend",
@@ -4336,7 +5777,30 @@ nom-du-pod.nom-du-service.namespace.svc.cluster.local</code></pre><button class=
         "Vérifie toutes les ressources : <code>kubectl get all -n projet-final</code>"
       ],
       validation: "Tu dois avoir 5 Pods Running au total : 1 Redis, 2 API, 2 frontend. Les Services doivent être accessibles via port-forward. Les variables d'environnement du ConfigMap et du Secret doivent être présentes dans les Pods API.",
-      hint: "Si un Pod ne démarre pas, utilise <code>kubectl describe pod &lt;nom&gt; -n projet-final</code> pour voir les Events. Vérifie aussi les logs avec <code>kubectl logs &lt;pod&gt; -n projet-final</code>."
+      hint: "Si un Pod ne démarre pas, utilise <code>kubectl describe pod &lt;nom&gt; -n projet-final</code> pour voir les Events. Vérifie aussi les logs avec <code>kubectl logs &lt;pod&gt; -n projet-final</code>.",
+      check: [
+        {
+          label: "Le Deployment api existe",
+          args: ["get", "deployment", "api", "-n", "projet-final", "-o", "json"],
+          rules: [
+            { path: "status.readyReplicas", atLeast: 2, label: "Les 2 réplicas de l'API sont prêts" }
+          ]
+        },
+        {
+          label: "Le Deployment frontend existe",
+          args: ["get", "deployment", "frontend", "-n", "projet-final", "-o", "json"],
+          rules: [
+            { path: "status.readyReplicas", atLeast: 2, label: "Les 2 réplicas du frontend sont prêts" }
+          ]
+        },
+        {
+          label: "Le Service api existe",
+          args: ["get", "svc", "api", "-n", "projet-final", "-o", "json"],
+          rules: [
+            { path: "spec.ports.*.port", equals: 80, label: "L'API est exposée sur le port 80" }
+          ]
+        }
+      ]
     },
     {
       title: "Configurer l'Ingress et le routage",
@@ -4353,7 +5817,18 @@ nom-du-pod.nom-du-service.namespace.svc.cluster.local</code></pre><button class=
         "Vérifie le routage : <code>curl http://projet.local/api/headers</code> (autre endpoint de httpbin)"
       ],
       validation: "Le frontend doit répondre sur <code>http://projet.local/</code> et l'API sur <code>http://projet.local/api/*</code>. Le rewrite-target doit correctement supprimer le préfixe /api avant de transmettre la requête au backend.",
-      hint: "Si l'Ingress ne répond pas, vérifie : 1) <code>kubectl describe ingress projet-ingress -n projet-final</code> pour les erreurs, 2) les Pods du namespace ingress-nginx, 3) que /etc/hosts contient bien l'IP de minikube."
+      hint: "Si l'Ingress ne répond pas, vérifie : 1) <code>kubectl describe ingress projet-ingress -n projet-final</code> pour les erreurs, 2) les Pods du namespace ingress-nginx, 3) que /etc/hosts contient bien l'IP de minikube.",
+      check: [
+        {
+          label: "L'Ingress du projet existe",
+          args: ["get", "ingress", "-n", "projet-final", "-o", "json"],
+          rules: [
+            { path: "items.length", atLeast: 1, label: "Un Ingress est déclaré dans projet-final" },
+            { path: "items.*.spec.rules.*.host", equals: "projet.local", label: "Il route le host projet.local" },
+            { path: "items.*.spec.rules.*.http.paths.length", atLeast: 2, label: "Le frontend et l'API sont routés séparément" }
+          ]
+        }
+      ]
     }
   ],
   commands: [

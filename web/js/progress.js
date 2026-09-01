@@ -28,5 +28,25 @@ const Progress = {
     a.click();
     a.remove();
     URL.revokeObjectURL(url);
+  },
+
+  async cluster() {
+    try {
+      const r = await fetch('/api/cluster');
+      if (!r.ok) throw new Error(r.statusText);
+      return await r.json();
+    } catch {
+      return { kubectl: false, context: '' };
+    }
+  },
+
+  async check(args) {
+    const r = await fetch('/api/check', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ args })
+    });
+    if (!r.ok) return { kubectl: true, code: -1, stdout: '', stderr: await r.text() };
+    return await r.json();
   }
 };
